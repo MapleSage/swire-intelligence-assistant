@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 */node_modules/
+**/node_modules/
+swire-frontend/node_modules/
+swire-agent-core/node_modules/
 
 # Environment variables
 .env
