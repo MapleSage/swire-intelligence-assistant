@@ -1,0 +1,17 @@
+aws:
+  region: us-east-1
+  bedrock_model_id: anthropic.claude-3-sonnet-20240229-v1:0
+
+vector_db:
+  type: faiss
+  index_path: ./data/vector_index
+
+database:
+  type: postgresql
+  host: localhost
+  port: 5432
+  database: swire_db
+
+logging:
+  level: INFO
+  file: ./logs/agent.log

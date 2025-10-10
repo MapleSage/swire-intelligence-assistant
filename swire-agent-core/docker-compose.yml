@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  swire-agent:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - AWS_REGION=us-east-1
+      - BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: swire_db
+      POSTGRES_USER: swire_user
+      POSTGRES_PASSWORD: swire_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

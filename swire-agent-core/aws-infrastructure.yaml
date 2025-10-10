@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Swire Intelligence Assistant Infrastructure'
+
+Resources:
+  # ECS Cluster
+  SwireCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: swire-cluster
+
+  # ECR Repository
+  SwireECR:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: swire-agent
+
+  # ECS Task Definition
+  SwireTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: swire-agent-task
+      Cpu: 512
+      Memory: 1024
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ECSExecutionRole
+      ContainerDefinitions:
+        - Name: swire-agent
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/swire-agent:latest"
+          PortMappings:
+            - ContainerPort: 8000
+          Environment:
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: swire-agent
+
+  # Application Load Balancer
+  SwireALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: swire-agent-alb
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+
+  # ECS Service
+  SwireService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref SwireCluster
+      TaskDefinition: !Ref SwireTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - !Ref PrivateSubnet1
+            - !Ref PrivateSubnet2
+          SecurityGroups:
+            - !Ref ECSSecurityGroup
+      LoadBalancers:
+        - ContainerName: swire-agent
+          ContainerPort: 8000
+          TargetGroupArn: !Ref TargetGroup
+
+Outputs:
+  LoadBalancerURL:
+    Description: 'Load Balancer URL'
+    Value: !Sub 'https://${SwireALB.DNSName}'

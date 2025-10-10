@@ -1,0 +1,25 @@
+Swire Renewables Operational Procedures
+
+Site Operations:
+- Daily site inspections at 0800 hours
+- Equipment status reports submitted by 1000 hours
+- Maintenance schedules reviewed weekly
+- Performance metrics tracked hourly
+
+Wind Farm Management:
+- Turbine availability target: 97%
+- Scheduled maintenance windows: Sundays 0600-1200
+- Remote monitoring 24/7 from control center
+- Predictive maintenance using vibration analysis
+
+Quality Control:
+- ISO 9001:2015 compliance required
+- Monthly quality audits conducted
+- Corrective action plans within 48 hours
+- Continuous improvement initiatives
+
+Environmental Compliance:
+- Wildlife monitoring during migration seasons
+- Noise level measurements quarterly
+- Soil and water testing annually
+- Carbon footprint reporting monthly
