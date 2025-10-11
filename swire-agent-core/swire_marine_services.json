@@ -1,0 +1,14 @@
+{
+  "value": [
+    {
+      "@search.action": "upload",
+      "id": "swire_marine_services",
+      "title": "Swire Marine Services",
+      "content": "# Marine Services\n\n## Swire Renewable Energy Expertise\n\n\n**Specialized offshore wind services and marine operations**\n\nComplete marine logistics and installation support for offshore wind projects.\n\n**Marine Capabilities:**\n- Offshore installation vessel operations\n- Jack-up platform services\n- Marine logistics and transport\n- Subsea cable installation\n- Weather routing and planning\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:18:00.707441",
+      "tags": "swire, wind-energy, marine-services"
+    }
+  ]
+}

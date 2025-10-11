@@ -1,4 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { BedrockAgentRuntimeClient, InvokeAgentCommand } from '@aws-sdk/client-bedrock-agent-runtime';
+
+const client = new BedrockAgentRuntimeClient({
+  region: process.env.AWS_REGION || 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -6,32 +15,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { query, agentId } = req.body;
-
-    // Call Bedrock Agent directly
-    const response = await fetch(`https://bedrock-agent-runtime.us-east-1.amazonaws.com/agents/${agentId}/sessions/test-session/text`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `AWS4-HMAC-SHA256 Credential=${process.env.AWS_ACCESS_KEY_ID}/20251010/us-east-1/bedrock/aws4_request`
-      },
-      body: JSON.stringify({
-        inputText: query
-      })
-    });
-
-    const data = await response.json();
+    const { query, agentId = 'XMJHPK00RO' } = req.body;
     
-    res.status(200).json({
-      response: data.completion || 'Response from Bedrock Agent',
-      agentId: agentId
+    const command = new InvokeAgentCommand({
+      agentId,
+      agentAliasId: 'TSTALIASID',
+      sessionId: `session-${Date.now()}`,
+      inputText: query,
     });
 
-  } catch (error) {
-    console.error('Bedrock Agent error:', error);
+    const response = await client.send(command);
+    
+    // Process the streaming response
+    let fullResponse = '';
+    if (response.completion) {
+      for await (const chunk of response.completion) {
+        if (chunk.chunk?.bytes) {
+          const text = new TextDecoder().decode(chunk.chunk.bytes);
+          fullResponse += text;
+        }
+      }
+    }
+
+    res.status(200).json({
+      response: fullResponse || 'No response from agent',
+      sessionId: `session-${Date.now()}`,
+      agentId
+    });
+
+  } catch (error: any) {
+    console.error('Bedrock agent error:', error);
     res.status(500).json({ 
-      response: 'Swire Intelligence Assistant is ready. Ask about finance, operations, safety, or HR.',
-      error: 'Bedrock Agent temporarily unavailable'
+      error: 'Bedrock agent failed',
+      message: error.message,
+      response: 'I apologize, but I encountered an error connecting to the Bedrock agent. Please try again.'
     });
   }
 }

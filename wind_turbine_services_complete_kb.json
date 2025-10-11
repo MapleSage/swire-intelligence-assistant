@@ -1,0 +1,137 @@
+{
+  "wind_turbine_services_comprehensive": {
+    "search_results": {
+      "Wind Turbine Blade Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Pre-Assembly and Installation Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine HV and Electrical Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Marine Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Service & Maintenance": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Maintenance": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Installation": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Electrical Systems": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Offshore Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Blade Inspection": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Gearbox Maintenance": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Tower Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Generator Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Control Systems": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      },
+      "Wind Turbine Safety Services": {
+        "models_count": 0,
+        "datasets_count": 0,
+        "spaces_count": 0,
+        "total_results": 0
+      }
+    },
+    "service_categories": {
+      "blade_services": [],
+      "pre_assembly_installation": [],
+      "hv_electrical_services": [],
+      "marine_services": [],
+      "maintenance_services": [],
+      "inspection_services": [],
+      "safety_services": []
+    },
+    "technical_specifications": [],
+    "industry_standards": [],
+    "equipment_and_tools": [],
+    "maintenance_procedures": []
+  },
+  "swire_wind_services": {
+    "experience": "20+ years in wind energy sector",
+    "global_projects": [
+      "Baltic Eagle offshore wind farm",
+      "Yunlin offshore wind project Taiwan"
+    ],
+    "service_portfolio": [
+      "Pre-Assembly and Installation Services",
+      "Blade Services and Maintenance",
+      "HV and Electrical Services",
+      "Service & Maintenance",
+      "Marine Services",
+      "Actsafe Power Ascenders"
+    ],
+    "technical_capabilities": [
+      "Offshore wind turbine installation",
+      "Blade inspection and repair",
+      "Electrical system commissioning",
+      "Marine logistics and support",
+      "Predictive maintenance programs",
+      "Safety training and certification"
+    ],
+    "key_contacts": {
+      "operations": "operations@swire.com",
+      "technical": "technical@swire.com",
+      "marine": "marine@swire.com"
+    }
+  }
+}

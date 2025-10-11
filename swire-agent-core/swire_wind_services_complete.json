@@ -1,0 +1,64 @@
+{
+  "value": [
+    {
+      "@search.action": "upload",
+      "id": "swire_pre-assembly_and_installation_services",
+      "title": "Swire Pre-Assembly and Installation Services",
+      "content": "# Pre-Assembly and Installation Services\n\n## Swire Renewable Energy Expertise\n\n\n**Full scope or tailored support to your project requirements**\n\nWith over 20 years' experience, our specialist teams bring expertise to support and manage the pre-assembly and installation of onshore and offshore wind turbines.\n\n**Key Services:**\n- Efficient pre-assembly at the ports\n- One supplier for complete set-up\n- Onshore and offshore installation\n- Expert HV and electrical and mechanical installation and commissioning\n\n**Case Studies:**\n- **Baltic Eagle**: 50 x V174-9.5MW Vestas turbines (2023-2024)\n- **Yunlin**: 80 x SG8.0-167Mk IV SGRE turbines (2020-2025)\n\n**Key Contact:** Hanne Fynbo, General Manager, Pre-Assembly & Installation\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:17:59.295256",
+      "tags": "swire, wind-energy, pre-assembly-and-installation-services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_blade_services",
+      "title": "Swire Blade Services",
+      "content": "# Blade Services\n\n## Swire Renewable Energy Expertise\n\n\n**Comprehensive blade maintenance, repair, and optimization services**\n\nSpecialized blade services ensuring optimal aerodynamic performance and structural integrity.\n\n**Services Include:**\n- Blade inspection and assessment\n- Leading edge erosion repair\n- Lightning protection system maintenance\n- Structural repairs and reinforcement\n- Performance optimization\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:17:59.630186",
+      "tags": "swire, wind-energy, blade-services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_hv_and_electrical_services",
+      "title": "Swire HV and Electrical Services",
+      "content": "# HV and Electrical Services\n\n## Swire Renewable Energy Expertise\n\n\n**High voltage electrical systems installation, maintenance, and testing**\n\nExpert electrical services for wind farm infrastructure and grid connection.\n\n**Capabilities:**\n- HV cable installation and termination\n- Transformer and switchgear commissioning\n- Protection system configuration\n- Grid code compliance testing\n- Electrical safety certification\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:18:00.062034",
+      "tags": "swire, wind-energy, hv-and-electrical-services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_service_and_maintenance",
+      "title": "Swire Service & Maintenance",
+      "content": "# Service & Maintenance\n\n## Swire Renewable Energy Expertise\n\n\n**Comprehensive O&M services for wind farm operations**\n\nFull-service maintenance programs to maximize turbine availability and performance.\n\n**Service Programs:**\n- Scheduled preventive maintenance\n- Condition monitoring and diagnostics\n- Emergency repair services\n- Performance optimization\n- Spare parts management\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:18:00.392341",
+      "tags": "swire, wind-energy, service-&-maintenance"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_marine_services",
+      "title": "Swire Marine Services",
+      "content": "# Marine Services\n\n## Swire Renewable Energy Expertise\n\n\n**Specialized offshore wind services and marine operations**\n\nComplete marine logistics and installation support for offshore wind projects.\n\n**Marine Capabilities:**\n- Offshore installation vessel operations\n- Jack-up platform services\n- Marine logistics and transport\n- Subsea cable installation\n- Weather routing and planning\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:18:00.707441",
+      "tags": "swire, wind-energy, marine-services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_actsafe_power_ascenders",
+      "title": "Swire Actsafe Power Ascenders",
+      "content": "# Actsafe Power Ascenders\n\n## Swire Renewable Energy Expertise\n\n\n**Advanced climbing and access solutions for wind turbine maintenance**\n\nSafety equipment and training for efficient and safe turbine access.\n\n**Equipment & Training:**\n- Actsafe power ascenders for tower climbing\n- Fall protection and rescue systems\n- Emergency evacuation procedures\n- Height safety certification programs\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:18:01.026456",
+      "tags": "swire, wind-energy, actsafe-power-ascenders"
+    }
+  ]
+}

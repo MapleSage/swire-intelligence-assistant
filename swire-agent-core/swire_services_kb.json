@@ -1,0 +1,64 @@
+{
+  "value": [
+    {
+      "@search.action": "upload",
+      "id": "swire_pre-assembly_and_installation_services",
+      "title": "Pre-Assembly and Installation Services",
+      "content": "# Pre-Assembly and Installation Services\n\nComplete pre-assembly and installation solutions for wind turbine projects\n\n## Services Offered:\n- Turbine component pre-assembly at staging areas\n- Foundation preparation and installation\n- Tower erection and nacelle installation\n- Rotor and blade assembly and installation\n- Electrical connections and commissioning\n- Grid connection and testing\n\n## Key Capabilities:\n- Heavy lift crane operations\n- Specialized transport and logistics\n- Site preparation and civil works\n- Quality assurance and safety protocols\n",
+      "source": "Swire Services Portfolio",
+      "type": "swire-service",
+      "uploadedAt": "2025-10-10T21:12:21.821505",
+      "tags": "swire, pre-assembly-and-installation-services, wind-energy, services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_blade_services",
+      "title": "Blade Services",
+      "content": "# Blade Services\n\nComprehensive blade maintenance, repair, and optimization services\n\n## Services Offered:\n- Blade inspection using drones and rope access\n- Leading edge erosion repair\n- Lightning protection system maintenance\n- Blade balancing and aerodynamic optimization\n- Structural repairs and reinforcement\n- Blade cleaning and surface treatments\n\n## Technologies & Methods:\n- Advanced composite repair techniques\n- Non-destructive testing methods\n- Aerodynamic performance analysis\n- Predictive maintenance algorithms\n",
+      "source": "Swire Services Portfolio",
+      "type": "swire-service",
+      "uploadedAt": "2025-10-10T21:12:21.821714",
+      "tags": "swire, blade-services, wind-energy, services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_hv_and_electrical_services",
+      "title": "HV and Electrical Services",
+      "content": "# HV and Electrical Services\n\nHigh voltage electrical systems installation, maintenance, and testing\n\n## Services Offered:\n- HV cable installation and termination\n- Transformer installation and commissioning\n- Switchgear testing and maintenance\n- Protection system configuration\n- Power quality analysis and optimization\n- Electrical safety testing and certification\n\n## Technical Expertise:\n- 33kV and 66kV systems\n- SCADA integration\n- Grid code compliance\n- Electrical fault analysis\n",
+      "source": "Swire Services Portfolio",
+      "type": "swire-service",
+      "uploadedAt": "2025-10-10T21:12:21.821721",
+      "tags": "swire, hv-and-electrical-services, wind-energy, services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_service_and_maintenance",
+      "title": "Service & Maintenance",
+      "content": "# Service & Maintenance\n\nComprehensive O&M services for wind farm operations\n\n## Services Offered:\n- Scheduled preventive maintenance\n- Condition monitoring and diagnostics\n- Emergency repair services\n- Performance optimization\n- Spare parts management\n- Technical support and training\n\n## Service Programs:\n- Full-service O&M contracts\n- Condition-based maintenance\n- Remote monitoring services\n- Warranty management\n",
+      "source": "Swire Services Portfolio",
+      "type": "swire-service",
+      "uploadedAt": "2025-10-10T21:12:21.821734",
+      "tags": "swire, service-&-maintenance, wind-energy, services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_marine_services",
+      "title": "Marine Services",
+      "content": "# Marine Services\n\nSpecialized offshore wind services and marine operations\n\n## Services Offered:\n- Offshore installation vessel operations\n- Jack-up platform services\n- Marine logistics and transport\n- Subsea cable installation\n- Offshore maintenance campaigns\n- Weather routing and planning\n\n## Marine Vessels:\n- Self-propelled jack-up vessels\n- Crew transfer vessels (CTVs)\n- Service operation vessels (SOVs)\n- Heavy lift vessels\n",
+      "source": "Swire Services Portfolio",
+      "type": "swire-service",
+      "uploadedAt": "2025-10-10T21:12:21.821738",
+      "tags": "swire, marine-services, wind-energy, services"
+    },
+    {
+      "@search.action": "upload",
+      "id": "swire_actsafe_power_ascenders",
+      "title": "Actsafe Power Ascenders",
+      "content": "# Actsafe Power Ascenders\n\nAdvanced climbing and access solutions for wind turbine maintenance\n\n## Equipment & Systems:\n- Actsafe power ascenders for tower climbing\n- Fall protection and rescue systems\n- Portable winch systems\n- Rope access equipment and training\n- Emergency evacuation systems\n- Height safety certification programs\n\n## Key Benefits:\n- Reduced climbing time and fatigue\n- Enhanced worker safety\n- Emergency rescue capabilities\n- Compliance with height safety regulations",
+      "source": "Swire Services Portfolio",
+      "type": "swire-service",
+      "uploadedAt": "2025-10-10T21:12:21.821742",
+      "tags": "swire, actsafe-power-ascenders, wind-energy, services"
+    }
+  ]
+}

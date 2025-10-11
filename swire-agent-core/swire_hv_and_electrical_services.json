@@ -1,0 +1,14 @@
+{
+  "value": [
+    {
+      "@search.action": "upload",
+      "id": "swire_hv_and_electrical_services",
+      "title": "Swire HV and Electrical Services",
+      "content": "# HV and Electrical Services\n\n## Swire Renewable Energy Expertise\n\n\n**High voltage electrical systems installation, maintenance, and testing**\n\nExpert electrical services for wind farm infrastructure and grid connection.\n\n**Capabilities:**\n- HV cable installation and termination\n- Transformer and switchgear commissioning\n- Protection system configuration\n- Grid code compliance testing\n- Electrical safety certification\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:18:00.062034",
+      "tags": "swire, wind-energy, hv-and-electrical-services"
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "wind_turbine_services_comprehensive": {
+    "blade_services": {
+      "description": "Comprehensive blade maintenance, inspection, and repair services",
+      "services": [
+        "Blade surface inspection and damage assessment",
+        "Leading edge erosion repair and protection",
+        "Lightning protection system maintenance",
+        "Blade balancing and aerodynamic optimization",
+        "Crack detection and structural repairs",
+        "Ice detection and mitigation systems",
+        "Blade cleaning and surface treatments"
+      ],
+      "technologies": [
+        "Drone-based blade inspection systems",
+        "Rope access techniques for blade maintenance",
+        "Composite repair materials and techniques",
+        "Vibration analysis for blade condition monitoring",
+        "Thermographic imaging for defect detection",
+        "Ultrasonic testing for internal damage assessment"
+      ],
+      "maintenance_procedures": [
+        "Visual inspection protocols",
+        "Non-destructive testing methods",
+        "Repair material application procedures",
+        "Quality control and documentation",
+        "Safety protocols for height work",
+        "Environmental condition monitoring"
+      ]
+    },
+    "pre_assembly_installation": {
+      "description": "Complete pre-assembly and installation services for wind turbines",
+      "services": [
+        "Foundation design and installation",
+        "Tower assembly and erection",
+        "Nacelle installation and positioning",
+        "Rotor assembly and blade installation",
+        "Electrical connection and commissioning",
+        "Control system integration and testing"
+      ],
+      "equipment": [
+        "Heavy lift cranes (up to 1600 tons)",
+        "Specialized transport vehicles",
+        "Foundation drilling equipment",
+        "Precision alignment tools",
+        "Torque wrenches and hydraulic tools",
+        "Safety equipment and fall protection"
+      ],
+      "project_phases": [
+        "Site preparation and access roads",
+        "Foundation construction",
+        "Component delivery and staging",
+        "Mechanical assembly",
+        "Electrical installation",
+        "Commissioning and testing",
+        "Performance verification"
+      ]
+    },
+    "hv_electrical_services": {
+      "description": "High voltage electrical systems and services",
+      "services": [
+        "HV cable installation and termination",
+        "Transformer installation and testing",
+        "Switchgear commissioning",
+        "Protection system configuration",
+        "SCADA system integration",
+        "Grid connection and synchronization"
+      ],
+      "technical_capabilities": [
+        "33kV and 66kV electrical systems",
+        "Submarine cable installation",
+        "Offshore substation construction",
+        "Power quality monitoring",
+        "Electrical testing and commissioning",
+        "Fault detection and analysis"
+      ],
+      "safety_standards": [
+        "IEC 61400 wind turbine standards",
+        "IEEE electrical safety standards",
+        "NFPA 70E electrical safety requirements",
+        "Arc flash protection protocols",
+        "Lockout/tagout procedures",
+        "Personal protective equipment standards"
+      ]
+    },
+    "marine_services": {
+      "description": "Specialized marine services for offshore wind projects",
+      "services": [
+        "Jack-up vessel operations",
+        "Crew transfer vessel services",
+        "Heavy lift vessel operations",
+        "Cable laying and burial",
+        "Subsea foundation installation",
+        "Marine logistics and supply"
+      ],
+      "vessel_types": [
+        "Self-elevating platforms (jack-ups)",
+        "Dynamic positioning vessels",
+        "Crew transfer vessels (CTVs)",
+        "Service operation vessels (SOVs)",
+        "Cable laying vessels",
+        "Heavy lift vessels"
+      ],
+      "marine_operations": [
+        "Weather window planning",
+        "Vessel positioning and stability",
+        "Cargo handling and lifting",
+        "Personnel transfer operations",
+        "Emergency response procedures",
+        "Environmental monitoring"
+      ]
+    },
+    "service_maintenance": {
+      "description": "Ongoing service and maintenance operations",
+      "services": [
+        "Preventive maintenance programs",
+        "Condition monitoring systems",
+        "Predictive maintenance analytics",
+        "Emergency repair services",
+        "Component replacement programs",
+        "Performance optimization services"
+      ],
+      "maintenance_types": [
+        "Scheduled maintenance (quarterly, annual)",
+        "Condition-based maintenance",
+        "Corrective maintenance",
+        "Major component overhauls",
+        "Gearbox maintenance and replacement",
+        "Generator maintenance and repair"
+      ],
+      "monitoring_systems": [
+        "SCADA data analysis",
+        "Vibration monitoring",
+        "Oil analysis programs",
+        "Temperature monitoring",
+        "Power curve analysis",
+        "Availability tracking"
+      ]
+    },
+    "swire_expertise": {
+      "company_profile": "Swire Energy Services - 20+ years in renewable energy",
+      "global_presence": [
+        "Asia Pacific operations",
+        "European offshore projects", 
+        "North American wind farms",
+        "Emerging markets development"
+      ],
+      "key_projects": [
+        {
+          "name": "Baltic Eagle Offshore Wind Farm",
+          "location": "German North Sea",
+          "capacity": "476 MW",
+          "services": ["Marine installation", "Electrical systems", "Commissioning"]
+        },
+        {
+          "name": "Yunlin Offshore Wind Project",
+          "location": "Taiwan Strait",
+          "capacity": "640 MW", 
+          "services": ["Pre-assembly", "Installation", "Marine logistics"]
+        }
+      ],
+      "certifications": [
+        "ISO 9001 Quality Management",
+        "ISO 14001 Environmental Management",
+        "ISO 45001 Occupational Health & Safety",
+        "GWO Basic Safety Training",
+        "IRATA Rope Access Certification"
+      ],
+      "contact_information": {
+        "headquarters": "Hong Kong",
+        "operations_email": "operations@swire.com",
+        "technical_email": "technical@swire.com",
+        "marine_email": "marine@swire.com",
+        "emergency_hotline": "+852-2840-8888"
+      }
+    },
+    "industry_standards": [
+      "IEC 61400 series - Wind turbine standards",
+      "IEC 61936 - Power installations exceeding 1 kV",
+      "DNV GL standards for offshore wind",
+      "API standards for marine operations",
+      "NORSOK standards for offshore structures",
+      "GWO training standards"
+    ],
+    "safety_protocols": [
+      "Working at height procedures",
+      "Confined space entry protocols",
+      "Electrical safety procedures",
+      "Marine safety operations",
+      "Emergency response plans",
+      "Environmental protection measures"
+    ],
+    "technology_trends": [
+      "Digitalization and IoT integration",
+      "Artificial intelligence for predictive maintenance",
+      "Advanced materials for blade construction",
+      "Floating wind turbine technology",
+      "Hybrid renewable energy systems",
+      "Energy storage integration"
+    ]
+  }
+}

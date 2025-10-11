@@ -1,0 +1,14 @@
+{
+  "value": [
+    {
+      "@search.action": "upload",
+      "id": "swire_blade_services",
+      "title": "Swire Blade Services",
+      "content": "# Blade Services\n\n## Swire Renewable Energy Expertise\n\n\n**Comprehensive blade maintenance, repair, and optimization services**\n\nSpecialized blade services ensuring optimal aerodynamic performance and structural integrity.\n\n**Services Include:**\n- Blade inspection and assessment\n- Leading edge erosion repair\n- Lightning protection system maintenance\n- Structural repairs and reinforcement\n- Performance optimization\n\n\n## Industry Resources and Data\n\nSpecialized industrial service - limited public datasets available.\n",
+      "source": "Swire Renewable Energy",
+      "type": "wind-service",
+      "uploadedAt": "2025-10-10T21:17:59.630186",
+      "tags": "swire, wind-energy, blade-services"
+    }
+  ]
+}

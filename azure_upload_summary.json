@@ -1,0 +1,16 @@
+{
+  "upload_summary": {
+    "total_documents": 37,
+    "service_categories": [
+      "service_maintenance",
+      "blade_services",
+      "pre_assembly_installation",
+      "swire_expertise",
+      "marine_services",
+      "hv_electrical_services"
+    ],
+    "created_date": "2025-10-10T21:29:16.376964",
+    "azure_endpoint": "https://ai-parvinddutta9607ai577068173144.search.windows.net",
+    "index_name": "swire-wind-services"
+  }
+}

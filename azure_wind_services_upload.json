@@ -1,0 +1,633 @@
+{
+  "value": [
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services",
+      "title": "Blade Services",
+      "content": "{\n  \"description\": \"Comprehensive blade maintenance, inspection, and repair services\",\n  \"services\": [\n    \"Blade surface inspection and damage assessment\",\n    \"Leading edge erosion repair and protection\",\n    \"Lightning protection system maintenance\",\n    \"Blade balancing and aerodynamic optimization\",\n    \"Crack detection and structural repairs\",\n    \"Ice detection and mitigation systems\",\n    \"Blade cleaning and surface treatments\"\n  ],\n  \"technologies\": [\n    \"Drone-based blade inspection systems\",\n    \"Rope access techniques for blade maintenance\",\n    \"Composite repair materials and techniques\",\n    \"Vibration analysis for blade condition monitoring\",\n    \"Thermographic imaging for defect detection\",\n    \"Ultrasonic testing for internal damage assessment\"\n  ],\n  \"maintenance_procedures\": [\n    \"Visual inspection protocols\",\n    \"Non-destructive testing methods\",\n    \"Repair material application procedures\",\n    \"Quality control and documentation\",\n    \"Safety protocols for height work\",\n    \"Environmental condition monitoring\"\n  ]\n}",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Comprehensive blade maintenance, inspection, and repair services",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "renewable_energy",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375926",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services-service-0",
+      "title": "Blade Services - Blade surface inspection and damage assessment",
+      "content": "Blade surface inspection and damage assessment",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Blade surface inspection and damage assessment",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375982",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services-service-1",
+      "title": "Blade Services - Leading edge erosion repair and protection",
+      "content": "Leading edge erosion repair and protection",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Leading edge erosion repair and protection",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375986",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services-service-2",
+      "title": "Blade Services - Lightning protection system maintenance",
+      "content": "Lightning protection system maintenance",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Lightning protection system maintenance",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375987",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services-service-3",
+      "title": "Blade Services - Blade balancing and aerodynamic optimization",
+      "content": "Blade balancing and aerodynamic optimization",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Blade balancing and aerodynamic optimization",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375989",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services-service-4",
+      "title": "Blade Services - Crack detection and structural repairs",
+      "content": "Crack detection and structural repairs",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Crack detection and structural repairs",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375991",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services-service-5",
+      "title": "Blade Services - Ice detection and mitigation systems",
+      "content": "Ice detection and mitigation systems",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Ice detection and mitigation systems",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375992",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-blade_services-service-6",
+      "title": "Blade Services - Blade cleaning and surface treatments",
+      "content": "Blade cleaning and surface treatments",
+      "category": "wind_turbine_services",
+      "service_type": "blade_services",
+      "description": "Blade cleaning and surface treatments",
+      "tags": [
+        "blade_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.375994",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-pre_assembly_installation",
+      "title": "Pre Assembly Installation",
+      "content": "{\n  \"description\": \"Complete pre-assembly and installation services for wind turbines\",\n  \"services\": [\n    \"Foundation design and installation\",\n    \"Tower assembly and erection\",\n    \"Nacelle installation and positioning\",\n    \"Rotor assembly and blade installation\",\n    \"Electrical connection and commissioning\",\n    \"Control system integration and testing\"\n  ],\n  \"equipment\": [\n    \"Heavy lift cranes (up to 1600 tons)\",\n    \"Specialized transport vehicles\",\n    \"Foundation drilling equipment\",\n    \"Precision alignment tools\",\n    \"Torque wrenches and hydraulic tools\",\n    \"Safety equipment and fall protection\"\n  ],\n  \"project_phases\": [\n    \"Site preparation and access roads\",\n    \"Foundation construction\",\n    \"Component delivery and staging\",\n    \"Mechanical assembly\",\n    \"Electrical installation\",\n    \"Commissioning and testing\",\n    \"Performance verification\"\n  ]\n}",
+      "category": "wind_turbine_services",
+      "service_type": "pre_assembly_installation",
+      "description": "Complete pre-assembly and installation services for wind turbines",
+      "tags": [
+        "pre_assembly_installation",
+        "wind_turbine",
+        "renewable_energy",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376016",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-pre_assembly_installation-service-0",
+      "title": "Pre Assembly Installation - Foundation design and installation",
+      "content": "Foundation design and installation",
+      "category": "wind_turbine_services",
+      "service_type": "pre_assembly_installation",
+      "description": "Foundation design and installation",
+      "tags": [
+        "pre_assembly_installation",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376019",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-pre_assembly_installation-service-1",
+      "title": "Pre Assembly Installation - Tower assembly and erection",
+      "content": "Tower assembly and erection",
+      "category": "wind_turbine_services",
+      "service_type": "pre_assembly_installation",
+      "description": "Tower assembly and erection",
+      "tags": [
+        "pre_assembly_installation",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376022",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-pre_assembly_installation-service-2",
+      "title": "Pre Assembly Installation - Nacelle installation and positioning",
+      "content": "Nacelle installation and positioning",
+      "category": "wind_turbine_services",
+      "service_type": "pre_assembly_installation",
+      "description": "Nacelle installation and positioning",
+      "tags": [
+        "pre_assembly_installation",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376024",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-pre_assembly_installation-service-3",
+      "title": "Pre Assembly Installation - Rotor assembly and blade installation",
+      "content": "Rotor assembly and blade installation",
+      "category": "wind_turbine_services",
+      "service_type": "pre_assembly_installation",
+      "description": "Rotor assembly and blade installation",
+      "tags": [
+        "pre_assembly_installation",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376026",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-pre_assembly_installation-service-4",
+      "title": "Pre Assembly Installation - Electrical connection and commissioning",
+      "content": "Electrical connection and commissioning",
+      "category": "wind_turbine_services",
+      "service_type": "pre_assembly_installation",
+      "description": "Electrical connection and commissioning",
+      "tags": [
+        "pre_assembly_installation",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376027",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-pre_assembly_installation-service-5",
+      "title": "Pre Assembly Installation - Control system integration and testing",
+      "content": "Control system integration and testing",
+      "category": "wind_turbine_services",
+      "service_type": "pre_assembly_installation",
+      "description": "Control system integration and testing",
+      "tags": [
+        "pre_assembly_installation",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376029",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-hv_electrical_services",
+      "title": "Hv Electrical Services",
+      "content": "{\n  \"description\": \"High voltage electrical systems and services\",\n  \"services\": [\n    \"HV cable installation and termination\",\n    \"Transformer installation and testing\",\n    \"Switchgear commissioning\",\n    \"Protection system configuration\",\n    \"SCADA system integration\",\n    \"Grid connection and synchronization\"\n  ],\n  \"technical_capabilities\": [\n    \"33kV and 66kV electrical systems\",\n    \"Submarine cable installation\",\n    \"Offshore substation construction\",\n    \"Power quality monitoring\",\n    \"Electrical testing and commissioning\",\n    \"Fault detection and analysis\"\n  ],\n  \"safety_standards\": [\n    \"IEC 61400 wind turbine standards\",\n    \"IEEE electrical safety standards\",\n    \"NFPA 70E electrical safety requirements\",\n    \"Arc flash protection protocols\",\n    \"Lockout/tagout procedures\",\n    \"Personal protective equipment standards\"\n  ]\n}",
+      "category": "wind_turbine_services",
+      "service_type": "hv_electrical_services",
+      "description": "High voltage electrical systems and services",
+      "tags": [
+        "hv_electrical_services",
+        "wind_turbine",
+        "renewable_energy",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376045",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-hv_electrical_services-service-0",
+      "title": "Hv Electrical Services - HV cable installation and termination",
+      "content": "HV cable installation and termination",
+      "category": "wind_turbine_services",
+      "service_type": "hv_electrical_services",
+      "description": "HV cable installation and termination",
+      "tags": [
+        "hv_electrical_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376047",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-hv_electrical_services-service-1",
+      "title": "Hv Electrical Services - Transformer installation and testing",
+      "content": "Transformer installation and testing",
+      "category": "wind_turbine_services",
+      "service_type": "hv_electrical_services",
+      "description": "Transformer installation and testing",
+      "tags": [
+        "hv_electrical_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376049",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-hv_electrical_services-service-2",
+      "title": "Hv Electrical Services - Switchgear commissioning",
+      "content": "Switchgear commissioning",
+      "category": "wind_turbine_services",
+      "service_type": "hv_electrical_services",
+      "description": "Switchgear commissioning",
+      "tags": [
+        "hv_electrical_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376051",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-hv_electrical_services-service-3",
+      "title": "Hv Electrical Services - Protection system configuration",
+      "content": "Protection system configuration",
+      "category": "wind_turbine_services",
+      "service_type": "hv_electrical_services",
+      "description": "Protection system configuration",
+      "tags": [
+        "hv_electrical_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376052",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-hv_electrical_services-service-4",
+      "title": "Hv Electrical Services - SCADA system integration",
+      "content": "SCADA system integration",
+      "category": "wind_turbine_services",
+      "service_type": "hv_electrical_services",
+      "description": "SCADA system integration",
+      "tags": [
+        "hv_electrical_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376054",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-hv_electrical_services-service-5",
+      "title": "Hv Electrical Services - Grid connection and synchronization",
+      "content": "Grid connection and synchronization",
+      "category": "wind_turbine_services",
+      "service_type": "hv_electrical_services",
+      "description": "Grid connection and synchronization",
+      "tags": [
+        "hv_electrical_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376055",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-marine_services",
+      "title": "Marine Services",
+      "content": "{\n  \"description\": \"Specialized marine services for offshore wind projects\",\n  \"services\": [\n    \"Jack-up vessel operations\",\n    \"Crew transfer vessel services\",\n    \"Heavy lift vessel operations\",\n    \"Cable laying and burial\",\n    \"Subsea foundation installation\",\n    \"Marine logistics and supply\"\n  ],\n  \"vessel_types\": [\n    \"Self-elevating platforms (jack-ups)\",\n    \"Dynamic positioning vessels\",\n    \"Crew transfer vessels (CTVs)\",\n    \"Service operation vessels (SOVs)\",\n    \"Cable laying vessels\",\n    \"Heavy lift vessels\"\n  ],\n  \"marine_operations\": [\n    \"Weather window planning\",\n    \"Vessel positioning and stability\",\n    \"Cargo handling and lifting\",\n    \"Personnel transfer operations\",\n    \"Emergency response procedures\",\n    \"Environmental monitoring\"\n  ]\n}",
+      "category": "wind_turbine_services",
+      "service_type": "marine_services",
+      "description": "Specialized marine services for offshore wind projects",
+      "tags": [
+        "marine_services",
+        "wind_turbine",
+        "renewable_energy",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376072",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-marine_services-service-0",
+      "title": "Marine Services - Jack-up vessel operations",
+      "content": "Jack-up vessel operations",
+      "category": "wind_turbine_services",
+      "service_type": "marine_services",
+      "description": "Jack-up vessel operations",
+      "tags": [
+        "marine_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376075",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-marine_services-service-1",
+      "title": "Marine Services - Crew transfer vessel services",
+      "content": "Crew transfer vessel services",
+      "category": "wind_turbine_services",
+      "service_type": "marine_services",
+      "description": "Crew transfer vessel services",
+      "tags": [
+        "marine_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376076",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-marine_services-service-2",
+      "title": "Marine Services - Heavy lift vessel operations",
+      "content": "Heavy lift vessel operations",
+      "category": "wind_turbine_services",
+      "service_type": "marine_services",
+      "description": "Heavy lift vessel operations",
+      "tags": [
+        "marine_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376079",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-marine_services-service-3",
+      "title": "Marine Services - Cable laying and burial",
+      "content": "Cable laying and burial",
+      "category": "wind_turbine_services",
+      "service_type": "marine_services",
+      "description": "Cable laying and burial",
+      "tags": [
+        "marine_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376080",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-marine_services-service-4",
+      "title": "Marine Services - Subsea foundation installation",
+      "content": "Subsea foundation installation",
+      "category": "wind_turbine_services",
+      "service_type": "marine_services",
+      "description": "Subsea foundation installation",
+      "tags": [
+        "marine_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376082",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-marine_services-service-5",
+      "title": "Marine Services - Marine logistics and supply",
+      "content": "Marine logistics and supply",
+      "category": "wind_turbine_services",
+      "service_type": "marine_services",
+      "description": "Marine logistics and supply",
+      "tags": [
+        "marine_services",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376083",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-service_maintenance",
+      "title": "Service Maintenance",
+      "content": "{\n  \"description\": \"Ongoing service and maintenance operations\",\n  \"services\": [\n    \"Preventive maintenance programs\",\n    \"Condition monitoring systems\",\n    \"Predictive maintenance analytics\",\n    \"Emergency repair services\",\n    \"Component replacement programs\",\n    \"Performance optimization services\"\n  ],\n  \"maintenance_types\": [\n    \"Scheduled maintenance (quarterly, annual)\",\n    \"Condition-based maintenance\",\n    \"Corrective maintenance\",\n    \"Major component overhauls\",\n    \"Gearbox maintenance and replacement\",\n    \"Generator maintenance and repair\"\n  ],\n  \"monitoring_systems\": [\n    \"SCADA data analysis\",\n    \"Vibration monitoring\",\n    \"Oil analysis programs\",\n    \"Temperature monitoring\",\n    \"Power curve analysis\",\n    \"Availability tracking\"\n  ]\n}",
+      "category": "wind_turbine_services",
+      "service_type": "service_maintenance",
+      "description": "Ongoing service and maintenance operations",
+      "tags": [
+        "service_maintenance",
+        "wind_turbine",
+        "renewable_energy",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376103",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-service_maintenance-service-0",
+      "title": "Service Maintenance - Preventive maintenance programs",
+      "content": "Preventive maintenance programs",
+      "category": "wind_turbine_services",
+      "service_type": "service_maintenance",
+      "description": "Preventive maintenance programs",
+      "tags": [
+        "service_maintenance",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376105",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-service_maintenance-service-1",
+      "title": "Service Maintenance - Condition monitoring systems",
+      "content": "Condition monitoring systems",
+      "category": "wind_turbine_services",
+      "service_type": "service_maintenance",
+      "description": "Condition monitoring systems",
+      "tags": [
+        "service_maintenance",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376107",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-service_maintenance-service-2",
+      "title": "Service Maintenance - Predictive maintenance analytics",
+      "content": "Predictive maintenance analytics",
+      "category": "wind_turbine_services",
+      "service_type": "service_maintenance",
+      "description": "Predictive maintenance analytics",
+      "tags": [
+        "service_maintenance",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376109",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-service_maintenance-service-3",
+      "title": "Service Maintenance - Emergency repair services",
+      "content": "Emergency repair services",
+      "category": "wind_turbine_services",
+      "service_type": "service_maintenance",
+      "description": "Emergency repair services",
+      "tags": [
+        "service_maintenance",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376110",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-service_maintenance-service-4",
+      "title": "Service Maintenance - Component replacement programs",
+      "content": "Component replacement programs",
+      "category": "wind_turbine_services",
+      "service_type": "service_maintenance",
+      "description": "Component replacement programs",
+      "tags": [
+        "service_maintenance",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376112",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-service_maintenance-service-5",
+      "title": "Service Maintenance - Performance optimization services",
+      "content": "Performance optimization services",
+      "category": "wind_turbine_services",
+      "service_type": "service_maintenance",
+      "description": "Performance optimization services",
+      "tags": [
+        "service_maintenance",
+        "wind_turbine",
+        "service_detail",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376113",
+      "source": "Swire Intelligence Assistant"
+    },
+    {
+      "@search.action": "mergeOrUpload",
+      "id": "wind-turbine-swire_expertise",
+      "title": "Swire Expertise",
+      "content": "{\n  \"company_profile\": \"Swire Energy Services - 20+ years in renewable energy\",\n  \"global_presence\": [\n    \"Asia Pacific operations\",\n    \"European offshore projects\",\n    \"North American wind farms\",\n    \"Emerging markets development\"\n  ],\n  \"key_projects\": [\n    {\n      \"name\": \"Baltic Eagle Offshore Wind Farm\",\n      \"location\": \"German North Sea\",\n      \"capacity\": \"476 MW\",\n      \"services\": [\n        \"Marine installation\",\n        \"Electrical systems\",\n        \"Commissioning\"\n      ]\n    },\n    {\n      \"name\": \"Yunlin Offshore Wind Project\",\n      \"location\": \"Taiwan Strait\",\n      \"capacity\": \"640 MW\",\n      \"services\": [\n        \"Pre-assembly\",\n        \"Installation\",\n        \"Marine logistics\"\n      ]\n    }\n  ],\n  \"certifications\": [\n    \"ISO 9001 Quality Management\",\n    \"ISO 14001 Environmental Management\",\n    \"ISO 45001 Occupational Health & Safety\",\n    \"GWO Basic Safety Training\",\n    \"IRATA Rope Access Certification\"\n  ],\n  \"contact_information\": {\n    \"headquarters\": \"Hong Kong\",\n    \"operations_email\": \"operations@swire.com\",\n    \"technical_email\": \"technical@swire.com\",\n    \"marine_email\": \"marine@swire.com\",\n    \"emergency_hotline\": \"+852-2840-8888\"\n  }\n}",
+      "category": "wind_turbine_services",
+      "service_type": "swire_expertise",
+      "description": "",
+      "tags": [
+        "swire_expertise",
+        "wind_turbine",
+        "renewable_energy",
+        "swire"
+      ],
+      "created_date": "2025-10-10T21:29:16.376145",
+      "source": "Swire Intelligence Assistant"
+    }
+  ]
+}

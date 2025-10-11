@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, LogOut, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff } from "lucide-react";
+import { Send, User, Bot, LogOut, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useAuth } from "../lib/auth-context";
+import { useOIDCAuth } from "../lib/oidc-auth";
 import DocumentUpload from "./DocumentUpload";
 import ModelSelector from "./ModelSelector";
 
@@ -13,11 +13,12 @@ interface Message {
 }
 
 const SwireChatInterface: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const auth = useOIDCAuth();
+  const user = auth.user?.profile;
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your Swire Intelligence Assistant with Azure AI integration. I can help you with:\n\n• **Financial summaries** - Revenue, expenses, profit analysis\n• **Man-hours reporting** - Site productivity and workforce data\n• **Safety information** - HSE guidelines and incident reports\n• **Document analysis** - Upload and analyze documents\n• **Voice interaction** - Speak your questions\n• **Dashboard insights** - Combined operational overviews\n\nWhat would you like to know?",
+      content: "Hello! I'm SageGreen, your AI assistant with advanced knowledge integration. I can help you with:\n\n• **Wind Turbine Services** - Blade maintenance, installation, electrical systems\n• **Renewable Energy** - Solar, wind, and sustainable energy solutions\n• **Technical Documentation** - Upload and analyze technical documents\n• **Voice interaction** - Speak your questions\n• **Industry Insights** - Latest renewable energy trends and data\n\nWhat would you like to know?",
       sender: "assistant",
       timestamp: new Date(),
     },
@@ -54,9 +55,18 @@ const SwireChatInterface: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Try Azure chat first, fallback to local
+      // Try Azure OpenAI first, fallback to Bedrock
       let response;
       try {
+        response = await fetch("/api/azure-chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ query: textToSend }),
+        });
+      } catch (azureError) {
+        // Fallback to Bedrock agent
         response = await fetch("/api/bedrock-agent", {
           method: "POST",
           headers: {
@@ -66,15 +76,6 @@ const SwireChatInterface: React.FC = () => {
             query: textToSend,
             agentId: "XMJHPK00RO"
           }),
-        });
-      } catch (azureError) {
-        // Fallback to local API
-        response = await fetch("http://localhost:8000/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ query: textToSend }),
         });
       }
 
@@ -193,15 +194,15 @@ const SwireChatInterface: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg border-r border-gray-200">
+      <div className="w-80 bg-white shadow-lg border-r border-gray-200">
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
               <Bot className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="font-semibold text-gray-900">Swire Intelligence</h1>
-              <p className="text-sm text-gray-500">Assistant</p>
+              <h1 className="font-semibold text-gray-900">SageGreen</h1>
+              <p className="text-sm text-gray-500">AI Assistant</p>
             </div>
           </div>
         </div>
@@ -258,14 +259,14 @@ const SwireChatInterface: React.FC = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-0 w-64 p-4 border-t border-gray-200 bg-white">
+        <div className="absolute bottom-0 w-80 p-4 border-t border-gray-200 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <User className="w-5 h-5 text-gray-400" />
-              <span className="text-sm text-gray-700">{user?.name || user?.username}</span>
+              <span className="text-sm text-gray-700">{user?.name || user?.email}</span>
             </div>
             <button
-              onClick={signOut}
+              onClick={auth.signOutRedirect}
               className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
               <LogOut className="w-4 h-4" />
             </button>
@@ -277,7 +278,7 @@ const SwireChatInterface: React.FC = () => {
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 p-4">
-          <h2 className="text-lg font-semibold text-gray-900">Chat with Swire Intelligence Assistant</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Chat with SageGreen</h2>
           <p className="text-sm text-gray-500">Ask about finances, operations, safety, and more</p>
         </div>
 
@@ -328,20 +329,50 @@ const SwireChatInterface: React.FC = () => {
 
         {/* Input */}
         <div className="bg-white border-t border-gray-200 p-4">
-          <div className="flex space-x-4">
-            <textarea
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask about finances, operations, safety, or anything else..."
-              className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-              rows={1}
-              disabled={isLoading}
-            />
+          <div className="flex items-end space-x-2">
+            <div className="flex-1 relative">
+              <textarea
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask about renewable energy, wind turbines, or anything else..."
+                className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                rows={1}
+                disabled={isLoading}
+              />
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setShowDocumentUpload(true)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Upload Document">
+                <Paperclip className="w-5 h-5" />
+              </button>
+              <button
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Take Screenshot">
+                <Monitor className="w-5 h-5" />
+              </button>
+              <button
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Camera">
+                <Camera className="w-5 h-5" />
+              </button>
+              <button
+                onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+                className={`p-2 rounded-lg transition-colors ${
+                  isRecording 
+                    ? "text-red-600 bg-red-50 hover:bg-red-100" 
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                }`}
+                title="Voice Input">
+                {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+            </div>
             <button
               onClick={() => sendMessage()}
               disabled={!inputMessage.trim() || isLoading}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              className="p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <Send className="w-5 h-5" />
             </button>
           </div>

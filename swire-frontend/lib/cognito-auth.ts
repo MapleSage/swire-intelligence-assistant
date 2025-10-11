@@ -19,7 +19,6 @@ export interface AuthUser {
 }
 
 export class CognitoAuth {
-  // Email/Password Authentication
   static async signUp(email: string, password: string, name: string) {
     try {
       const command = new SignUpCommand({
@@ -34,7 +33,7 @@ export class CognitoAuth {
       
       const response = await cognitoClient.send(command);
       return { success: true, userSub: response.UserSub };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
@@ -49,7 +48,7 @@ export class CognitoAuth {
       
       await cognitoClient.send(command);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
@@ -80,23 +79,20 @@ export class CognitoAuth {
       }
       
       return { success: false, error: "Authentication failed" };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
-  // Social Authentication (Google, Facebook, Apple)
   static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'Apple') {
-    const domain = "https://swire-auth.auth.us-east-1.amazoncognito.com";
-    const redirectUri = encodeURIComponent(window.location.origin + "/auth/callback");
+    const domain = "https://sagegreen-auth.auth.us-east-1.amazoncognito.com";
+    const redirectUri = encodeURIComponent("https://sagegreen.vercel.app/auth/callback");
     
     return `${domain}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=CODE&client_id=${CLIENT_ID}&scope=email+openid+profile`;
   }
 
-  // Biometric Authentication Setup
   static async setupBiometric(userId: string) {
     try {
-      // Check if WebAuthn is supported
       if (!window.PublicKeyCredential) {
         throw new Error("WebAuthn not supported");
       }
@@ -107,13 +103,13 @@ export class CognitoAuth {
       const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
         challenge,
         rp: {
-          name: "Swire Intelligence",
+          name: "SageGreen Intelligence",
           id: window.location.hostname,
         },
         user: {
           id: new TextEncoder().encode(userId),
           name: userId,
-          displayName: "Swire User",
+          displayName: "SageGreen User",
         },
         pubKeyCredParams: [{ alg: -7, type: "public-key" }],
         authenticatorSelection: {
@@ -128,7 +124,6 @@ export class CognitoAuth {
         publicKey: publicKeyCredentialCreationOptions
       }) as PublicKeyCredential;
 
-      // Store credential info
       localStorage.setItem('biometric_credential', JSON.stringify({
         id: credential.id,
         rawId: Array.from(new Uint8Array(credential.rawId)),
@@ -136,12 +131,11 @@ export class CognitoAuth {
       }));
 
       return { success: true, credentialId: credential.id };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
-  // Biometric Authentication
   static async authenticateWithBiometric() {
     try {
       const storedCredential = localStorage.getItem('biometric_credential');
@@ -168,32 +162,28 @@ export class CognitoAuth {
       });
 
       return { success: true, assertion };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
-  // Face Recognition Setup (using device camera)
   static async setupFaceRecognition() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'user' } 
       });
       
-      // Store face template (in production, this would be processed server-side)
       const faceTemplate = await this.captureFaceTemplate(stream);
       localStorage.setItem('face_template', JSON.stringify(faceTemplate));
       
       stream.getTracks().forEach(track => track.stop());
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
   private static async captureFaceTemplate(stream: MediaStream) {
-    // Simplified face template capture
-    // In production, use proper face recognition library
     return {
       timestamp: Date.now(),
       deviceId: navigator.userAgent,
@@ -212,15 +202,13 @@ export class CognitoAuth {
         video: { facingMode: 'user' } 
       });
       
-      // Compare with stored template
       const currentTemplate = await this.captureFaceTemplate(stream);
       stream.getTracks().forEach(track => track.stop());
       
-      // Simplified comparison (in production, use proper face matching)
       const match = JSON.parse(storedTemplate).deviceId === currentTemplate.deviceId;
       
       return { success: match };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
