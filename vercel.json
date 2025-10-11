@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd swire-frontend && npm run build",
+  "outputDirectory": "swire-frontend/.next",
+  "installCommand": "cd swire-frontend && npm install",
+  "framework": "nextjs",
+  "functions": {
+    "swire-frontend/pages/api/**/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
