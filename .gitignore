@@ -10,6 +10,9 @@ swire-agent-core/node_modules/
 .env.local
 .env.aws
 *.env
+swire-frontend/.env
+swire-frontend/.env.local
+swire-agent-core/.env
 
 # Build outputs
 .next/
@@ -41,4 +44,4 @@ temp/
 .aws/
 
 # Docker
-docker-compose.override.ymlswire-frontend/.env.local
+docker-compose.override.yml
