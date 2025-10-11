@@ -8,11 +8,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { query } = req.body;
     
-    const response = await fetch(`${process.env.AZURE_OPENAI_ENDPOINT}/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview`, {
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT || process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
+    const apiKey = process.env.AZURE_OPENAI_KEY || process.env.NEXT_PUBLIC_AZURE_OPENAI_KEY;
+    
+    if (!endpoint || !apiKey) {
+      throw new Error('Azure OpenAI credentials not configured');
+    }
+
+    const response = await fetch(`${endpoint}/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': process.env.AZURE_OPENAI_KEY!,
+        'api-key': apiKey,
       },
       body: JSON.stringify({
         messages: [

@@ -1,13 +1,23 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BedrockAgentRuntimeClient, InvokeAgentCommand } from '@aws-sdk/client-bedrock-agent-runtime';
 
-const client = new BedrockAgentRuntimeClient({
-  region: process.env.AWS_REGION || 'us-east-1',
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+const getBedrockClient = () => {
+  const region = process.env.AWS_REGION || process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID || process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY;
+  
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error('AWS credentials not configured');
+  }
+  
+  return new BedrockAgentRuntimeClient({
+    region,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+  });
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -16,6 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const { query, agentId = 'XMJHPK00RO' } = req.body;
+    
+    const client = getBedrockClient();
     
     const command = new InvokeAgentCommand({
       agentId,

@@ -55,29 +55,14 @@ const SwireChatInterface: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Try Azure OpenAI first, fallback to Bedrock
-      let response;
-      try {
-        response = await fetch("/api/azure-chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ query: textToSend }),
-        });
-      } catch (azureError) {
-        // Fallback to Bedrock agent
-        response = await fetch("/api/bedrock-agent", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ 
-            query: textToSend,
-            agentId: "XMJHPK00RO"
-          }),
-        });
-      }
+      const response = await fetch("/api/bedrock-agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          query: textToSend,
+          agentId: "XMJHPK00RO"
+        }),
+      });
 
       const data = await response.json();
 

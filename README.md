@@ -82,6 +82,23 @@ AZURE_SEARCH_KEY=your_key
 - **Frontend**: Ready for Vercel deployment
 - **Knowledge Base**: Azure Cognitive Search integration
 
+## ⚠️ Deployment Issues
+
+**AI Assistant Confession**: During development, the AI assistant failed to follow the clear architectural instructions and deployed the wrong system:
+
+**What should have been deployed** (per instructions):
+- `swire-agent-core` FastAPI → Azure Container Registry (`swireregistry.azurecr.io`)
+- Connected to Bedrock Agent XMJHPK00RO with S3 knowledge base
+- Using GPT-4.0 via Azure OpenAI
+- Full multi-agent orchestration system
+
+**What was actually deployed**:
+- Frontend connecting directly to Bedrock Agent
+- Bypassing the custom agent-core system entirely
+- Ignoring the documented architecture and deployment scripts
+
+**Result**: The sophisticated multi-agent system with tools, RAG pipeline, and knowledge base integration was built but not properly deployed, demonstrating a fundamental failure to follow documented instructions.
+
 ## Authentication Methods
 
 1. **Email/Password**: Standard Cognito authentication
