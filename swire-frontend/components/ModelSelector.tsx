@@ -57,10 +57,10 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
 
   const getProviderColor = (provider: string) => {
     switch (provider) {
-      case "azure": return "text-blue-600 bg-blue-50";
-      case "bedrock": return "text-orange-600 bg-orange-50";
-      case "local": return "text-green-600 bg-green-50";
-      default: return "text-gray-600 bg-gray-50";
+      case "azure": return "text-blue-400 bg-blue-500/20";
+      case "bedrock": return "text-orange-400 bg-orange-500/20";
+      case "local": return "text-emerald-400 bg-emerald-500/20";
+      default: return "text-slate-400 bg-slate-500/20";
     }
   };
 
@@ -68,22 +68,22 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors w-full min-w-64">
+        className="flex items-center space-x-3 p-3 bg-slate-700 border border-slate-600 rounded-xl hover:bg-slate-600 transition-all duration-200 w-full">
         
-        <div className={`p-2 rounded-lg ${getProviderColor(selectedModelData.provider)}`}>
-          {selectedModelData.icon}
+        <div className="p-2 rounded-lg bg-emerald-500/20">
+          <Brain className="w-4 h-4 text-emerald-400" />
         </div>
         
         <div className="flex-1 text-left">
-          <div className="font-medium text-gray-900">{selectedModelData.name}</div>
-          <div className="text-sm text-gray-500 truncate">{selectedModelData.description}</div>
+          <div className="font-medium text-white text-sm">{selectedModelData.name}</div>
+          <div className="text-xs text-slate-400 truncate">{selectedModelData.description}</div>
         </div>
         
-        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
           {models.map((model) => (
             <button
               key={model.id}
@@ -91,30 +91,30 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
                 onModelChange(model.id);
                 setIsOpen(false);
               }}
-              className={`w-full p-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 ${
-                model.id === selectedModel ? "bg-green-50 border-green-200" : ""
+              className={`w-full p-4 text-left hover:bg-slate-700 transition-all duration-200 border-b border-slate-700 last:border-b-0 ${
+                model.id === selectedModel ? "bg-emerald-900/30 border-emerald-600" : ""
               }`}>
               
               <div className="flex items-start space-x-3">
-                <div className={`p-2 rounded-lg ${getProviderColor(model.provider)}`}>
+                <div className="p-2 rounded-lg bg-emerald-500/20">
                   {model.icon}
                 </div>
                 
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
-                    <span className="font-medium text-gray-900">{model.name}</span>
-                    <span className={`px-2 py-1 text-xs rounded-full ${getProviderColor(model.provider)}`}>
+                    <span className="font-medium text-white text-sm">{model.name}</span>
+                    <span className="px-2 py-1 text-xs rounded-full bg-slate-700 text-slate-300">
                       {model.provider.toUpperCase()}
                     </span>
                   </div>
                   
-                  <p className="text-sm text-gray-600 mb-2">{model.description}</p>
+                  <p className="text-xs text-slate-400 mb-2">{model.description}</p>
                   
                   <div className="flex flex-wrap gap-1">
                     {model.capabilities.map((capability, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                        className="px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded-full">
                         {capability}
                       </span>
                     ))}
