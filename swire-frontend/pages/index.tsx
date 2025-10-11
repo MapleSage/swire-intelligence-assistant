@@ -1,57 +1,40 @@
-import React from "react";
-import { useOIDCAuth } from "../lib/oidc-auth";
+import { useAuth } from "react-oidc-context";
 import SwireChatInterface from "../components/SwireChatInterface";
-import { Bot } from "lucide-react";
 
 export default function Home() {
-  const auth = useOIDCAuth();
+  const auth = useAuth();
+
+  const signOutRedirect = () => {
+    const clientId = "3d51afuu9se41jk2gvmfr040dv";
+    const logoutUri = "http://localhost:3000";
+    const cognitoDomain = "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com";
+    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+  };
 
   if (auth.isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading SageGreen Intelligence...</p>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (auth.error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Authentication error: {auth.error.message}</p>
-          <button 
-            onClick={() => auth.signinRedirect()} 
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">Error: {auth.error.message}</div>;
   }
 
-  if (!auth.isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Bot className="w-12 h-12 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">SageGreen Intelligence</h1>
-          <p className="text-gray-600 mb-8">AI Assistant for Renewable Energy</p>
-          <button 
-            onClick={() => auth.signinRedirect()} 
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
+  if (auth.isAuthenticated) {
+    return <SwireChatInterface />;
   }
 
-  return <SwireChatInterface />;
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+        <img src="/sageigreen_logo_ wht.png" alt="SageGreen" className="w-16 h-16 mx-auto mb-4" />
+        <h1 className="text-2xl font-bold mb-4">Welcome to SageGreen</h1>
+        <button 
+          onClick={() => auth.signinRedirect()}
+          className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-3 rounded-xl hover:from-emerald-600 hover:to-teal-700"
+        >
+          Sign in
+        </button>
+      </div>
+    </div>
+  );
 }

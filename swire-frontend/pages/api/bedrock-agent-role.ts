@@ -1,23 +1,24 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BedrockAgentRuntimeClient, InvokeAgentCommand } from '@aws-sdk/client-bedrock-agent-runtime';
+import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { CONFIG } from '../../lib/config';
 
-const getBedrockClient = () => {
-  const region = CONFIG.AWS.REGION;
-  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-  
-  if (!accessKeyId || !secretAccessKey) {
-    throw new Error('AWS credentials not configured');
-  }
-  
-  return new BedrockAgentRuntimeClient({
-    region,
+const getAssumedRoleCredentials = async () => {
+  const stsClient = new STSClient({
+    region: CONFIG.AWS.REGION,
     credentials: {
-      accessKeyId,
-      secretAccessKey,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
     },
   });
+
+  const assumeRoleCommand = new AssumeRoleCommand({
+    RoleArn: 'arn:aws:iam::679217508095:role/sweri-bedrock',
+    RoleSessionName: 'bedrock-agent-session',
+  });
+
+  const response = await stsClient.send(assumeRoleCommand);
+  return response.Credentials;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -31,8 +32,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
     }
+
+    const credentials = await getAssumedRoleCredentials();
     
-    const client = getBedrockClient();
+    const client = new BedrockAgentRuntimeClient({
+      region: CONFIG.AWS.REGION,
+      credentials: {
+        accessKeyId: credentials?.AccessKeyId!,
+        secretAccessKey: credentials?.SecretAccessKey!,
+        sessionToken: credentials?.SessionToken!,
+      },
+    });
     
     const command = new InvokeAgentCommand({
       agentId,
@@ -43,7 +53,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const response = await client.send(command);
     
-    // Process the streaming response
     let fullResponse = '';
     if (response.completion) {
       const decoder = new TextDecoder();

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, LogOut, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor } from "lucide-react";
+import { Send, User, Bot, LogOut, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor, Copy, Volume2, ThumbsUp, ThumbsDown, RotateCcw, Plus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useOIDCAuth } from "../lib/oidc-auth";
 import DocumentUpload from "./DocumentUpload";
@@ -14,11 +14,18 @@ interface Message {
 
 const SwireChatInterface: React.FC = () => {
   const auth = useOIDCAuth();
-  const user = auth.user?.profile;
+  const [user, setUser] = React.useState<any>(null);
+  
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm SageGreen, your AI assistant with advanced knowledge integration. I can help you with:\n\n• **Wind Turbine Services** - Blade maintenance, installation, electrical systems\n• **Renewable Energy** - Solar, wind, and sustainable energy solutions\n• **Technical Documentation** - Upload and analyze technical documents\n• **Voice interaction** - Speak your questions\n• **Industry Insights** - Latest renewable energy trends and data\n\nWhat would you like to know?",
+      content: "Hello! I'm SageGreen, your renewable energy AI assistant with industry knowledge base access. I can help you with:\n\n• **Financial Analytics** - Revenue, costs, and ROI analysis\n• **Operations Data** - Man-hours, site metrics, and performance\n• **Safety Management** - PPE requirements and safety protocols\n• **Dashboard Insights** - Energy production and efficiency metrics\n• **Technical Support** - Wind and solar system guidance\n\nI have access to sample industry data for demonstrations. What would you like to explore?",
       sender: "assistant",
       timestamp: new Date(),
     },
@@ -55,12 +62,11 @@ const SwireChatInterface: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/bedrock-agent", {
+      const response = await fetch("/api/simple-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          query: textToSend,
-          agentId: "XMJHPK00RO"
+          query: textToSend
         }),
       });
 
@@ -176,18 +182,33 @@ const SwireChatInterface: React.FC = () => {
     setInputMessage(query);
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const readAloud = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+  };
+
+  const handleFeedback = (messageId: string, type: 'up' | 'down') => {
+    console.log(`Feedback ${type} for message ${messageId}`);
+  };
+
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
       {/* Sidebar */}
       <div className="w-72 bg-slate-900 shadow-2xl flex flex-col">
-        <div className="p-6 border-b border-slate-700">
+        <div className="p-6 border-b border-slate-700 bg-gradient-to-br from-emerald-500 to-teal-600">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Bot className="w-6 h-6 text-white" />
+            <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg">
+              <img src="/sageigreen_logo_ wht.png" alt="SageGreen" className="w-20 h-20 rounded-xl object-contain" />
             </div>
             <div>
               <h1 className="font-bold text-white text-lg">SageGreen</h1>
-              <p className="text-sm text-slate-400">AI Assistant</p>
+              <p className="text-sm text-slate-200">Renewable Energy AI</p>
             </div>
           </div>
         </div>
@@ -252,7 +273,7 @@ const SwireChatInterface: React.FC = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
-              <span className="text-sm text-slate-300 font-medium">{user?.name || user?.email}</span>
+              <span className="text-sm text-slate-300 font-medium">{user?.name || user?.email || 'Guest User'}</span>
             </div>
             <button
               onClick={auth.signOutRedirect}
@@ -267,8 +288,8 @@ const SwireChatInterface: React.FC = () => {
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900">Chat with SageGreen</h2>
-          <p className="text-sm text-slate-600 mt-1">Ask about finances, operations, safety, and more</p>
+          <h2 className="text-xl font-bold text-slate-900">Renewable Energy Assistant</h2>
+          <p className="text-sm text-slate-600 mt-1">Financial data, operations metrics, safety protocols, and industry insights</p>
         </div>
 
         {/* Messages */}
@@ -285,16 +306,46 @@ const SwireChatInterface: React.FC = () => {
                 }`}>
                 <div className="flex items-start space-x-3">
                   {message.sender === "assistant" && (
-                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Bot className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <img src="/SageGreen-1.png" alt="SageGreen" className="w-8 h-8 rounded-xl" />
                     </div>
                   )}
                   <div className="flex-1">
-                    <ReactMarkdown className="prose prose-sm max-w-none">
-                      {message.content}
-                    </ReactMarkdown>
-                    <div className="text-xs opacity-70 mt-2">
-                      {message.timestamp.toLocaleTimeString()}
+                    <div className="prose prose-sm max-w-none overflow-hidden">
+                      <ReactMarkdown className="break-words">
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                    <div className="text-xs opacity-70 mt-2 flex items-center justify-between">
+                      <span>{message.timestamp.toLocaleTimeString()}</span>
+                      {message.sender === "assistant" && (
+                        <div className="flex items-center space-x-2">
+                          <button 
+                            onClick={() => copyToClipboard(message.content)}
+                            className="p-1 hover:bg-slate-100 rounded" 
+                            title="Copy">
+                            <Copy className="w-3 h-3" />
+                          </button>
+                          <button 
+                            onClick={() => readAloud(message.content)}
+                            className="p-1 hover:bg-slate-100 rounded" 
+                            title="Read aloud">
+                            <Volume2 className="w-3 h-3" />
+                          </button>
+                          <button 
+                            onClick={() => handleFeedback(message.id, 'up')}
+                            className="p-1 hover:bg-slate-100 rounded" 
+                            title="Good response">
+                            <ThumbsUp className="w-3 h-3" />
+                          </button>
+                          <button 
+                            onClick={() => handleFeedback(message.id, 'down')}
+                            className="p-1 hover:bg-slate-100 rounded" 
+                            title="Bad response">
+                            <ThumbsDown className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -338,18 +389,20 @@ const SwireChatInterface: React.FC = () => {
               <button
                 onClick={() => setShowDocumentUpload(true)}
                 className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
-                title="Upload Document">
+                title="Add attachment">
+                <Plus className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => window.open('https://www.google.com', '_blank')}
+                className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                title="Browse web">
+                <Globe className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setShowDocumentUpload(true)}
+                className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                title="Upload file">
                 <Paperclip className="w-5 h-5" />
-              </button>
-              <button
-                className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
-                title="Take Screenshot">
-                <Monitor className="w-5 h-5" />
-              </button>
-              <button
-                className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
-                title="Camera">
-                <Camera className="w-5 h-5" />
               </button>
               <button
                 onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
@@ -358,7 +411,7 @@ const SwireChatInterface: React.FC = () => {
                     ? "text-red-600 bg-red-50 hover:bg-red-100" 
                     : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
                 }`}
-                title="Voice Input">
+                title="Voice input">
                 {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </button>
             </div>

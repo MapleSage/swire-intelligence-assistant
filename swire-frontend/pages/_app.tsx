@@ -9,6 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <title>SageGreen Intelligence - AI Assistant</title>
         <link rel="icon" href="/Sage_Favicon.png" />
+        <link rel="apple-touch-icon" href="/SageGreen-1.png" />
       </Head>
       <OIDCAuthProvider>
         <Component {...pageProps} />
