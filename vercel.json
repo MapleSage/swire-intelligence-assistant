@@ -1,6 +1,16 @@
 {
-  "buildCommand": "cd swire-frontend && npm run build",
-  "outputDirectory": "swire-frontend/.next",
-  "installCommand": "cd swire-frontend && npm install",
-  "framework": "nextjs"
+  "version": 2,
+  "name": "sagegreen",
+  "builds": [
+    {
+      "src": "swire-frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/swire-frontend/$1"
+    }
+  ]
 }
