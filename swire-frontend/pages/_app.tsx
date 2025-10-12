@@ -1,19 +1,22 @@
+import { AuthProvider } from "react-oidc-context";
 import type { AppProps } from "next/app";
-import Head from "next/head";
-import { OIDCAuthProvider } from "../lib/oidc-auth";
 import "../styles/globals.css";
 
-export default function App({ Component, pageProps }: AppProps) {
+const cognitoAuthConfig = {
+  authority: "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_bdqsU9GjR", // Replace with your actual User Pool ID
+  client_id: "3d51afuu9se41jk2gvmfr040dv",
+  redirect_uri: typeof window !== 'undefined' ? window.location.origin + "/auth/callback" : "https://sagegreen.vercel.app/auth/callback",
+  response_type: "code",
+  scope: "email openid profile",
+  post_logout_redirect_uri: typeof window !== 'undefined' ? window.location.origin : "https://sagegreen.vercel.app",
+};
+
+function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <>
-      <Head>
-        <title>SageGreen Intelligence - AI Assistant</title>
-        <link rel="icon" href="/Sage_Favicon.png" />
-        <link rel="apple-touch-icon" href="/SageGreen-1.png" />
-      </Head>
-      <OIDCAuthProvider>
-        <Component {...pageProps} />
-      </OIDCAuthProvider>
-    </>
+    <AuthProvider {...cognitoAuthConfig}>
+      <Component {...pageProps} />
+    </AuthProvider>
   );
 }
+
+export default MyApp;
