@@ -1,16 +1,18 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useOIDCAuth } from '../../lib/oidc-auth';
 
 export default function AuthCallback() {
   const router = useRouter();
-  const auth = useOIDCAuth();
 
   useEffect(() => {
-    if (auth.isAuthenticated) {
+    const { code } = router.query;
+    
+    if (code) {
+      // Store auth code and redirect to main app
+      localStorage.setItem('cognito_auth_code', code as string);
       router.push('/');
     }
-  }, [auth.isAuthenticated, router]);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
