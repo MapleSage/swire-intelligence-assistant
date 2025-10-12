@@ -85,8 +85,8 @@ export class CognitoAuth {
   }
 
   static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'Apple') {
-    const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "https://sagegreen-auth.auth.us-east-1.amazoncognito.com";
-    const redirectUri = encodeURIComponent(typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : "https://sagegreen.vercel.app/auth/callback");
+    const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com";
+    const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI || "https://sagegreen.vercel.app/auth/callback");
     
     return `${domain}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=CODE&client_id=${CLIENT_ID}&scope=email+openid+profile`;
   }
