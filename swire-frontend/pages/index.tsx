@@ -36,9 +36,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
         <img
-          src="/sage_Favicon.png"
+          src="/sage.svg"
           alt="SageGreen"
-          className="w-16 h-16 mx-auto mb-4"
+          className="w-20 h-20 mx-auto mb-24"
         />
         <h1 className="text-2xl font-bold mb-4">Welcome to SageGreen</h1>
         <button
