@@ -6,7 +6,8 @@ export default function Home() {
 
   const signOutRedirect = () => {
     const clientId = "3d51afuu9se41jk2gvmfr040dv";
-    const logoutUri = "http://localhost:3000";
+    const loginUri = "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com/login"
+    const logoutUri = "https://sagegreen.vercel.app/sign-out";
     const cognitoDomain =
       "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com";
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;

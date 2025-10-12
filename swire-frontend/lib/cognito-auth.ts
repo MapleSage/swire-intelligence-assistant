@@ -9,7 +9,7 @@ const cognitoClient = new CognitoIdentityProviderClient({
 });
 
 const USER_POOL_ID = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || "us-east-1_demo";
-const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || "demo_client_id";
+const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || "3d51afuu9se41jk2gvmfr040dv";
 
 export interface AuthUser {
   username: string;
@@ -87,8 +87,10 @@ export class CognitoAuth {
   static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'Apple') {
     const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com";
     const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI || "https://sagegreen.vercel.app/auth/callback");
+    const clientId = CLIENT_ID;
     
-    return `${domain}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=CODE&client_id=${CLIENT_ID}&scope=email+openid+profile`;
+    // Fixed: response_type changed to lowercase 'code' and proper scope format
+    return `${domain}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
   }
 
   static async setupBiometric(userId: string) {
