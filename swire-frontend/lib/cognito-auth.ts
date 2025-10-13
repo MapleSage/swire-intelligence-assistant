@@ -1,16 +1,17 @@
 import { CognitoIdentityProviderClient, InitiateAuthCommand, SignUpCommand, ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { COGNITO_CONFIG, getRedirectUri } from './cognito-config';
 
 const cognitoClient = new CognitoIdentityProviderClient({
-  region: process.env.NEXT_PUBLIC_AWS_REGION || "us-east-1",
+  region: COGNITO_CONFIG.region,
   credentials: {
     accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || "",
     secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || ""
   }
 });
 
-const USER_POOL_ID = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || "us-east-1_bdqsU9GjR";
-const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || "3d51afuu9se41jk2gvmfr040dv";
-const COGNITO_DOMAIN = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com";
+const USER_POOL_ID = COGNITO_CONFIG.userPoolId;
+const CLIENT_ID = COGNITO_CONFIG.clientId;
+const COGNITO_DOMAIN = COGNITO_CONFIG.domain;
 
 export interface AuthUser {
   username: string;
@@ -20,24 +21,20 @@ export interface AuthUser {
 }
 
 export class CognitoAuth {
-  // Get the redirect URI based on current environment
-  private static getRedirectUri(): string {
-    if (typeof window === 'undefined') {
-      return process.env.NEXT_PUBLIC_REDIRECT_URI || "https://sagegreen.vercel.app/auth/callback";
-    }
-    return `${window.location.origin}/auth/callback`;
-  }
+
 
   // Redirect to Cognito hosted UI (shows all providers)
   static redirectToHostedUI() {
-    const redirectUri = encodeURIComponent(this.getRedirectUri());
-    window.location.href = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+profile&redirect_uri=${redirectUri}`;
+    const redirectUri = encodeURIComponent(getRedirectUri());
+    const scopes = COGNITO_CONFIG.scopes.join('+');
+    window.location.href = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=${COGNITO_CONFIG.responseType}&scope=${scopes}&redirect_uri=${redirectUri}`;
   }
 
   // Redirect to specific social provider
-  static redirectToSocialProvider(provider: 'Google' | 'Facebook' | 'Amazon') {
-    const redirectUri = encodeURIComponent(this.getRedirectUri());
-    window.location.href = `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+profile`;
+  static redirectToSocialProvider(provider: 'Google' | 'Facebook' | 'LoginWithAmazon') {
+    const redirectUri = encodeURIComponent(getRedirectUri());
+    const scopes = COGNITO_CONFIG.scopes.join('+');
+    window.location.href = `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=${COGNITO_CONFIG.responseType}&client_id=${CLIENT_ID}&scope=${scopes}`;
   }
 
   // Logout
@@ -124,9 +121,10 @@ export class CognitoAuth {
   }
 
   // DEPRECATED: Use redirectToSocialProvider instead
-  static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'Amazon') {
-    const redirectUri = encodeURIComponent(this.getRedirectUri());
-    return `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+profile`;
+  static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'LoginWithAmazon') {
+    const redirectUri = encodeURIComponent(getRedirectUri());
+    const scopes = COGNITO_CONFIG.scopes.join('+');
+    return `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=${COGNITO_CONFIG.responseType}&client_id=${CLIENT_ID}&scope=${scopes}`;
   }
 
   // Biometric methods (keep as is)

@@ -1,4 +1,5 @@
 import React from 'react';
+import SocialLoginButtons from './SocialLoginButtons';
 
 const CognitoLogin: React.FC = () => {
   const handleLogin = () => {
@@ -19,10 +20,18 @@ const CognitoLogin: React.FC = () => {
           <p className="text-gray-600">Enterprise AI Assistant</p>
         </div>
         
+        <SocialLoginButtons />
+        
+        <div className="my-6 flex items-center">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <div className="px-4 text-sm text-gray-500">or</div>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+        
         <button
           onClick={handleLogin}
           className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors">
-          Sign In with Cognito
+          Sign In with Email
         </button>
       </div>
     </div>
