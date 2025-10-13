@@ -1,4 +1,4 @@
-import { AuthProvider } from "react-oidc-context";
+import { AuthProvider } from "../lib/auth-context";
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
 

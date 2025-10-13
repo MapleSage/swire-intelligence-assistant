@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, User, Bot, LogOut, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor, Copy, Volume2, ThumbsUp, ThumbsDown, RotateCcw, Plus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useOIDCAuth } from "../lib/oidc-auth";
+import { CognitoAuth } from "../lib/cognito-auth";
 import DocumentUpload from "./DocumentUpload";
 import ModelSelector from "./ModelSelector";
 
@@ -13,15 +13,30 @@ interface Message {
 }
 
 const SwireChatInterface: React.FC = () => {
-  const auth = useOIDCAuth();
-  const [user, setUser] = React.useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   
-  React.useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+  useEffect(() => {
+    // Get user info from token
+    const idToken = localStorage.getItem('id_token');
+    if (idToken) {
+      try {
+        // Decode JWT token to get user info (basic decode, no verification needed here)
+        const base64Url = idToken.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        const tokenData = JSON.parse(jsonPayload);
+        setUser({
+          email: tokenData.email,
+          name: tokenData.name || tokenData.email
+        });
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
     }
   }, []);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -64,9 +79,13 @@ const SwireChatInterface: React.FC = () => {
     try {
       const response = await fetch("/api/simple-chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+        },
         body: JSON.stringify({ 
-          query: textToSend
+          query: textToSend,
+          model: selectedModel
         }),
       });
 
@@ -110,13 +129,15 @@ const SwireChatInterface: React.FC = () => {
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: "audio/wav" });
         
-        // Process audio with Azure Speech Services
         try {
           const formData = new FormData();
           formData.append("audio", blob, "recording.wav");
           
           const response = await fetch("/api/speech-to-text", {
             method: "POST",
+            headers: {
+              "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+            },
             body: formData,
           });
           
@@ -135,7 +156,6 @@ const SwireChatInterface: React.FC = () => {
       setMediaRecorder(recorder);
       setIsRecording(true);
 
-      // Auto-stop after 30 seconds
       setTimeout(() => {
         if (recorder.state === "recording") {
           recorder.stop();
@@ -165,7 +185,6 @@ const SwireChatInterface: React.FC = () => {
     setMessages((prev) => [...prev, documentMessage]);
     setShowDocumentUpload(false);
     
-    // Send document content for analysis
     setTimeout(() => {
       sendMessage(`Please analyze this document: ${content.substring(0, 2000)}...`);
     }, 1000);
@@ -273,11 +292,14 @@ const SwireChatInterface: React.FC = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
-              <span className="text-sm text-slate-300 font-medium">{user?.name || user?.email || 'Guest User'}</span>
+              <span className="text-sm text-slate-300 font-medium truncate max-w-[150px]">
+                {user?.name || user?.email || 'User'}
+              </span>
             </div>
             <button
-              onClick={auth.signOutRedirect}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200">
+              onClick={() => CognitoAuth.logout()}
+              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200"
+              title="Sign Out">
               <LogOut className="w-4 h-4" />
             </button>
           </div>

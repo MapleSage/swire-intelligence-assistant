@@ -8,8 +8,9 @@ const cognitoClient = new CognitoIdentityProviderClient({
   }
 });
 
-const USER_POOL_ID = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || "us-east-1_demo";
+const USER_POOL_ID = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || "us-east-1_bdqsU9GjR";
 const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || "3d51afuu9se41jk2gvmfr040dv";
+const COGNITO_DOMAIN = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com";
 
 export interface AuthUser {
   username: string;
@@ -19,6 +20,44 @@ export interface AuthUser {
 }
 
 export class CognitoAuth {
+  // Get the redirect URI based on current environment
+  private static getRedirectUri(): string {
+    if (typeof window === 'undefined') {
+      return process.env.NEXT_PUBLIC_REDIRECT_URI || "https://sagegreen.vercel.app/auth/callback";
+    }
+    return `${window.location.origin}/auth/callback`;
+  }
+
+  // Redirect to Cognito hosted UI (shows all providers)
+  static redirectToHostedUI() {
+    const redirectUri = encodeURIComponent(this.getRedirectUri());
+    window.location.href = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+openid+profile&redirect_uri=${redirectUri}`;
+  }
+
+  // Redirect to specific social provider
+  static redirectToSocialProvider(provider: 'Google' | 'Facebook' | 'LoginWithAmazon') {
+    const redirectUri = encodeURIComponent(this.getRedirectUri());
+    window.location.href = `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+openid+profile`;
+  }
+
+  // Logout
+  static logout() {
+    const logoutUri = encodeURIComponent(
+      typeof window !== 'undefined' ? window.location.origin : "https://sagegreen.vercel.app"
+    );
+    
+    // Clear local tokens
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('id_token');
+      localStorage.removeItem('refresh_token');
+    }
+    
+    // Redirect to Cognito logout
+    window.location.href = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${logoutUri}`;
+  }
+
+  // Legacy methods (keeping for backward compatibility but not recommended for hosted UI flow)
   static async signUp(email: string, password: string, name: string) {
     try {
       const command = new SignUpCommand({
@@ -84,15 +123,13 @@ export class CognitoAuth {
     }
   }
 
+  // DEPRECATED: Use redirectToSocialProvider instead
   static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'Apple') {
-    const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || "https://us-east-1bdqsu9gjr.auth.us-east-1.amazoncognito.com";
-    const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI || "https://sagegreen.vercel.app/auth/callback");
-    const clientId = CLIENT_ID;
-    
-    // Fixed: response_type changed to lowercase 'code' and proper scope format
-    return `${domain}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
+    const redirectUri = encodeURIComponent(this.getRedirectUri());
+    return `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+openid+profile`;
   }
 
+  // Biometric methods (keep as is)
   static async setupBiometric(userId: string) {
     try {
       if (!window.PublicKeyCredential) {
