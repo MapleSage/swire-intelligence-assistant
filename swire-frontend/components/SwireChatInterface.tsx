@@ -215,8 +215,8 @@ const SwireChatInterface: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Sidebar */}
-      <div className="w-72 bg-slate-900 shadow-2xl flex flex-col">
+      {/* Sidebar - Hidden on mobile */}
+      <div className="hidden lg:flex w-72 bg-slate-900 shadow-2xl flex-col">
         <div className="p-6 border-b border-slate-700 bg-gradient-to-br from-emerald-500 to-teal-600">
           <div className="flex items-center space-x-3">
             <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg">
@@ -312,20 +312,34 @@ const SwireChatInterface: React.FC = () => {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200 p-6">
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-3 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <img src="/sageigreen_logo_ wht.png" alt="SageGreen" className="w-6 h-6 rounded" />
+            <h1 className="font-bold text-white text-sm">SageGreen AI</h1>
+          </div>
+          <button
+            onClick={logout}
+            className="p-1 text-white/80 hover:text-white rounded"
+            title="Sign Out">
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+        
+        {/* Desktop Header */}
+        <div className="hidden lg:block bg-white/80 backdrop-blur-sm border-b border-slate-200 p-6">
           <h2 className="text-xl font-bold text-slate-900">Renewable Energy Assistant</h2>
           <p className="text-sm text-slate-600 mt-1">Financial data, operations metrics, safety protocols, and industry insights</p>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-3 lg:p-6 space-y-3 lg:space-y-6">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-4xl p-5 rounded-2xl shadow-sm ${
+                className={`max-w-full lg:max-w-4xl p-3 lg:p-5 rounded-2xl shadow-sm ${
                   message.sender === "user"
                     ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
                     : "bg-white border border-slate-200 text-slate-900"
@@ -398,20 +412,20 @@ const SwireChatInterface: React.FC = () => {
         </div>
 
         {/* Input */}
-        <div className="bg-white/80 backdrop-blur-sm border-t border-slate-200 p-6">
-          <div className="flex items-end space-x-4">
+        <div className="bg-white/80 backdrop-blur-sm border-t border-slate-200 p-3 lg:p-6">
+          <div className="flex items-end space-x-2 lg:space-x-4">
             <div className="flex-1 relative">
               <textarea
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about renewable energy, wind turbines, or anything else..."
-                className="w-full p-4 pr-12 border border-slate-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none bg-white shadow-sm"
-                rows={2}
+                placeholder="Ask about renewable energy..."
+                className="w-full p-3 lg:p-4 border border-slate-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none bg-white shadow-sm text-sm lg:text-base"
+                rows={1}
                 disabled={isLoading}
               />
             </div>
-            <div className="flex space-x-2">
+            <div className="hidden lg:flex space-x-2">
               <button
                 onClick={() => setShowDocumentUpload(true)}
                 className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
@@ -430,22 +444,22 @@ const SwireChatInterface: React.FC = () => {
                 title="Upload file">
                 <Paperclip className="w-5 h-5" />
               </button>
-              <button
-                onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-                className={`p-3 rounded-xl transition-all duration-200 ${
-                  isRecording 
-                    ? "text-red-600 bg-red-50 hover:bg-red-100" 
-                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
-                }`}
-                title="Voice input">
-                {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-              </button>
             </div>
+            <button
+              onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+              className={`p-2 lg:p-3 rounded-xl transition-all duration-200 ${
+                isRecording 
+                  ? "text-red-600 bg-red-50 hover:bg-red-100" 
+                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+              }`}
+              title="Voice input">
+              {isRecording ? <MicOff className="w-4 h-4 lg:w-5 lg:h-5" /> : <Mic className="w-4 h-4 lg:w-5 lg:h-5" />}
+            </button>
             <button
               onClick={() => sendMessage()}
               disabled={!inputMessage.trim() || isLoading}
-              className="p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg">
-              <Send className="w-5 h-5" />
+              className="p-3 lg:p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg">
+              <Send className="w-4 h-4 lg:w-5 lg:h-5" />
             </button>
           </div>
         </div>
