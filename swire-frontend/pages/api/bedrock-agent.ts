@@ -35,7 +35,7 @@ const getAzureSearchClient = () => {
 // Swire Renewable Energy knowledge base data
 const SWIRE_KB = {
   company: "Swire Renewable Energy (Swire RE) is a leading renewable energy developer and operator with headquarters in Hong Kong. The company is part of the Swire Group and focuses on developing, constructing, and operating wind and solar projects across Asia-Pacific and North America.",
-  leadership: "Rayan is a key executive at Swire Renewable Energy, leading strategic initiatives and project development across the company's renewable energy portfolio.",
+  leadership: "Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy. Under his leadership, the company is evolving to become a leading renewable energy inspection, repair and maintenance business, and ultimately a renewable energy asset manager. As CEO, Ryan focuses on combining the team's expertise with a commitment to health, safety and quality, positioning Swire RE as a strategic partner across the full renewable energy supply chain.",
   formosa: "Formosa Offshore Wind is Swire RE's flagship project located in Taiwan Strait with 376 MW capacity in Phase 1 and 376 MW in Phase 2. It uses Siemens Gamesa offshore turbines and is a joint venture with Ørsted and Macquarie Capital.",
   projects: "Current projects include Formosa Offshore Wind (Taiwan - 752MW total), North American Wind Portfolio (1,200+ MW), Utility-Scale Solar Development (500+ MW pipeline), and Battery Energy Storage Systems across multiple markets.",
   capabilities: "Swire RE specializes in offshore wind development, onshore wind farms, utility-scale solar PV systems, energy storage integration, grid connection services, and long-term asset management.",
@@ -84,8 +84,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (lowerQuery.includes('swire') || lowerQuery.includes('rayan') || lowerQuery.includes('swire-re')) {
       let swireResponse = '';
       
-      if (lowerQuery.includes('rayan')) {
-        swireResponse = `**Rayan - Swire Renewable Energy Leadership**\n\n${SWIRE_KB.leadership}\n\n**About Swire Renewable Energy:**\n${SWIRE_KB.company}\n\n**Key Projects:** ${SWIRE_KB.projects}`;
+      if (lowerQuery.includes('ryan') || lowerQuery.includes('smith') || lowerQuery.includes('ceo')) {
+        swireResponse = `**Ryan Smith - CEO, Swire Renewable Energy**\n\n${SWIRE_KB.leadership}\n\n**CEO Vision:** "We are entering an exciting phase of our company's journey - continuing our evolutionary path to become a leading renewable energy inspection, repair and maintenance business, and ultimately a renewable energy asset manager. As an independent company, we are now better positioned to adapt and grow with the rapidly evolving renewable energy market."\n\n**About Swire Renewable Energy:**\n${SWIRE_KB.company}`;
       } else if (lowerQuery.includes('formosa')) {
         swireResponse = `**Formosa Offshore Wind Project**\n\n${SWIRE_KB.formosa}\n\nThis is one of Taiwan's largest offshore wind developments and represents Swire RE's commitment to advancing renewable energy in the Asia-Pacific region.`;
       } else if (lowerQuery.includes('project')) {
