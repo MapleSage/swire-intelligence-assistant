@@ -1,0 +1,18 @@
+{
+  "company_leadership": {
+    "ceo": {
+      "name": "Ryan Smith",
+      "title": "Chief Executive Officer",
+      "company": "Swire Renewable Energy",
+      "message": "We are entering an exciting phase of our company's journey - continuing our evolutionary path to become a leading renewable energy inspection, repair and maintenance business, and ultimately a renewable energy asset manager. As an independent company, we are now better positioned to adapt and grow with the rapidly evolving renewable energy market. By combining our team's expertise and our focus on health, safety and quality, our ultimate goal is to be a strategic partner for stakeholders across the full renewable energy supply chain, driving innovation and sustainable growth for the industry."
+    }
+  },
+  "company_info": {
+    "name": "Swire Renewable Energy",
+    "focus": "Renewable energy inspection, repair and maintenance",
+    "vision": "Leading renewable energy asset manager",
+    "core_values": ["Health and safety", "Quality", "Innovation", "Sustainable growth"],
+    "market_position": "Independent company positioned for rapid growth",
+    "target_market": "Full renewable energy supply chain"
+  }
+}
