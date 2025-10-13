@@ -1,33 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "../lib/auth-context";
 import SwireChatInterface from "../components/SwireChatInterface";
-import { CognitoAuth } from "../lib/cognito-auth";
 
 export default function Home() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { session, loading, isAuthenticated, loginWithHostedUI } = useAuth();
 
   useEffect(() => {
-    // Check if user is authenticated
-    const checkAuth = () => {
-      const accessToken = localStorage.getItem('access_token');
-      const idToken = localStorage.getItem('id_token');
-      
-      if (accessToken && idToken) {
-        setIsAuthenticated(true);
-        setIsLoading(false);
-      } else {
-        // Not authenticated - redirect to Cognito
-        setIsLoading(false);
-        CognitoAuth.redirectToHostedUI();
-      }
-    };
+    if (!loading && !isAuthenticated) {
+      // Redirect to Cognito hosted UI
+      loginWithHostedUI();
+    }
+  }, [loading, isAuthenticated]);
 
-    checkAuth();
-  }, []);
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-gray-600 text-xl">Loading...</div>
@@ -35,24 +22,13 @@ export default function Home() {
     );
   }
 
-  if (isAuthenticated) {
+  if (!isAuthenticated) {
     return (
-      <div className="relative">
-        <SwireChatInterface />
-        <button
-          onClick={() => CognitoAuth.logout()}
-          className="fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 shadow-lg z-50 transition-colors"
-        >
-          Sign Out
-        </button>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-600 text-xl">Redirecting to login...</div>
       </div>
     );
   }
 
-  // Redirecting to Cognito...
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-gray-600 text-xl">Redirecting to login...</div>
-    </div>
-  );
+  return <SwireChatInterface />;
 }

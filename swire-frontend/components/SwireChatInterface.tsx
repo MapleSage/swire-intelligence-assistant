@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, User, Bot, LogOut, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor, Copy, Volume2, ThumbsUp, ThumbsDown, RotateCcw, Plus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { CognitoAuth } from "../lib/cognito-auth";
+import { useAuth } from "../lib/auth-context";
 import DocumentUpload from "./DocumentUpload";
 import ModelSelector from "./ModelSelector";
 
@@ -13,29 +13,20 @@ interface Message {
 }
 
 const SwireChatInterface: React.FC = () => {
+  const { session, logout } = useAuth();
   const [user, setUser] = useState<any>(null);
   
   useEffect(() => {
-    // Get user info from token
-    const idToken = localStorage.getItem('id_token');
-    if (idToken) {
-      try {
-        // Decode JWT token to get user info (basic decode, no verification needed here)
-        const base64Url = idToken.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        const tokenData = JSON.parse(jsonPayload);
-        setUser({
-          email: tokenData.email,
-          name: tokenData.name || tokenData.email
-        });
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
+    // Get user info from Amplify session
+    if (session?.tokens?.idToken) {
+      const idToken = session.tokens.idToken;
+      setUser({
+        email: idToken.payload.email,
+        name: idToken.payload.name || idToken.payload.email,
+        sub: idToken.payload.sub
+      });
     }
-  }, []);
+  }, [session]);
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -77,11 +68,14 @@ const SwireChatInterface: React.FC = () => {
     setIsLoading(true);
 
     try {
+      // Get access token from Amplify session
+      const accessToken = session?.tokens?.accessToken?.toString();
+      
       const response = await fetch("/api/simple-chat", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+          ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
         },
         body: JSON.stringify({ 
           query: textToSend,
@@ -100,6 +94,7 @@ const SwireChatInterface: React.FC = () => {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
+      console.error("Message error:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: "I'm sorry, there was an error connecting to the service. Please try again.",
@@ -133,10 +128,12 @@ const SwireChatInterface: React.FC = () => {
           const formData = new FormData();
           formData.append("audio", blob, "recording.wav");
           
+          const accessToken = session?.tokens?.accessToken?.toString();
+          
           const response = await fetch("/api/speech-to-text", {
             method: "POST",
             headers: {
-              "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+              ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
             },
             body: formData,
           });
@@ -292,12 +289,19 @@ const SwireChatInterface: React.FC = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
-              <span className="text-sm text-slate-300 font-medium truncate max-w-[150px]">
-                {user?.name || user?.email || 'User'}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-sm text-slate-300 font-medium truncate max-w-[150px]">
+                  {user?.name || user?.email || 'User'}
+                </span>
+                {user?.email && user?.name !== user?.email && (
+                  <span className="text-xs text-slate-500 truncate max-w-[150px]">
+                    {user.email}
+                  </span>
+                )}
+              </div>
             </div>
             <button
-              onClick={() => CognitoAuth.logout()}
+              onClick={logout}
               className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200"
               title="Sign Out">
               <LogOut className="w-4 h-4" />

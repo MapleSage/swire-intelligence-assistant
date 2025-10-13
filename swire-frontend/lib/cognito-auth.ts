@@ -31,13 +31,13 @@ export class CognitoAuth {
   // Redirect to Cognito hosted UI (shows all providers)
   static redirectToHostedUI() {
     const redirectUri = encodeURIComponent(this.getRedirectUri());
-    window.location.href = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+openid+profile&redirect_uri=${redirectUri}`;
+    window.location.href = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+profile&redirect_uri=${redirectUri}`;
   }
 
   // Redirect to specific social provider
-  static redirectToSocialProvider(provider: 'Google' | 'Facebook' | 'LoginWithAmazon') {
+  static redirectToSocialProvider(provider: 'Google' | 'Facebook' | 'Amazon') {
     const redirectUri = encodeURIComponent(this.getRedirectUri());
-    window.location.href = `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+openid+profile`;
+    window.location.href = `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+profile`;
   }
 
   // Logout
@@ -124,9 +124,9 @@ export class CognitoAuth {
   }
 
   // DEPRECATED: Use redirectToSocialProvider instead
-  static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'Apple') {
+  static getSocialSignInUrl(provider: 'Google' | 'Facebook' | 'Amazon') {
     const redirectUri = encodeURIComponent(this.getRedirectUri());
-    return `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+openid+profile`;
+    return `${COGNITO_DOMAIN}/oauth2/authorize?identity_provider=${provider}&redirect_uri=${redirectUri}&response_type=code&client_id=${CLIENT_ID}&scope=email+profile`;
   }
 
   // Biometric methods (keep as is)

@@ -6,7 +6,7 @@ const CognitoLogin: React.FC = () => {
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI || 'https://sagegreen.vercel.app/auth/callback');
     
-    const loginUrl = `${domain}/login?client_id=${clientId}&response_type=code&scope=email+openid+profile&redirect_uri=${redirectUri}`;
+    const loginUrl = `${domain}/login?client_id=${clientId}&response_type=code&scope=email+profile&redirect_uri=${redirectUri}`;
     
     window.location.href = loginUrl;
   };
