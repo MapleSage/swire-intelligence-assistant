@@ -70,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         
         if (results.length > 0) {
-          azureContext = `\n\nAdditional context from knowledge base:\n${results.map(r => `• ${r.title}: ${r.content}`).join('\n')}`;
+          azureContext = `\n\nAdditional context from knowledge base:\n${results.map((r: any) => `• ${r.title}: ${r.content}`).join('\n')}`;
         }
       } catch (azureError) {
         console.log('Azure search error:', azureError);
