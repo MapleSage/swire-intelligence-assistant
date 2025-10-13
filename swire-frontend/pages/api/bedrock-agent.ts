@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BedrockAgentRuntimeClient, InvokeAgentCommand } from '@aws-sdk/client-bedrock-agent-runtime';
+import { SearchClient, AzureKeyCredential } from '@azure/search-documents';
 import { CONFIG } from '../../lib/config';
 
 const getBedrockClient = () => {
@@ -20,6 +21,26 @@ const getBedrockClient = () => {
   });
 };
 
+const getAzureSearchClient = () => {
+  const endpoint = process.env.AZURE_SEARCH_ENDPOINT;
+  const key = process.env.AZURE_SEARCH_KEY;
+  
+  if (!endpoint || !key) {
+    return null;
+  }
+  
+  return new SearchClient(endpoint, 'swire-index', new AzureKeyCredential(key));
+};
+
+// Swire Renewable Energy knowledge base data
+const SWIRE_KB = {
+  company: "Swire Renewable Energy is a leading renewable energy company focused on developing, constructing, and operating wind and solar projects across North America and Asia-Pacific regions.",
+  formosa: "Formosa Offshore Wind is Swire RE's flagship project located in Taiwan Strait with 376 MW capacity in Phase 1 and 376 MW in Phase 2. It uses Siemens Gamesa offshore turbines and is a joint venture with Ørsted.",
+  projects: "Current projects include Formosa Offshore Wind (Taiwan), North American Wind Portfolio (1,200+ MW), Utility-Scale Solar Development (500+ MW pipeline), and Battery Energy Storage Systems.",
+  capabilities: "Swire RE specializes in onshore/offshore wind development, utility-scale solar PV systems, energy storage integration, and grid integration services.",
+  sustainability: "Committed to net-zero emissions by 2030, science-based targets, biodiversity protection, and community engagement programs."
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -31,14 +52,65 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!query) {
       return res.status(400).json({ error: 'Query is required' });
     }
+
+    // Search Azure Knowledge Base first
+    let azureContext = '';
+    const searchClient = getAzureSearchClient();
+    
+    if (searchClient) {
+      try {
+        const searchResults = await searchClient.search(query, {
+          top: 3,
+          select: ['content', 'title']
+        });
+        
+        const results = [];
+        for await (const result of searchResults.results) {
+          results.push(result.document);
+        }
+        
+        if (results.length > 0) {
+          azureContext = `\n\nAdditional context from knowledge base:\n${results.map(r => `• ${r.title}: ${r.content}`).join('\n')}`;
+        }
+      } catch (azureError) {
+        console.log('Azure search error:', azureError);
+      }
+    }
+
+    // Check if query is about Swire and provide direct response
+    const lowerQuery = query.toLowerCase();
+    if (lowerQuery.includes('swire')) {
+      let swireResponse = '';
+      
+      if (lowerQuery.includes('formosa')) {
+        swireResponse = `**Formosa Offshore Wind Project**\n\n${SWIRE_KB.formosa}\n\nThis is one of Taiwan's largest offshore wind developments and represents Swire RE's commitment to advancing renewable energy in the Asia-Pacific region.`;
+      } else if (lowerQuery.includes('project')) {
+        swireResponse = `**Swire Renewable Energy Projects**\n\n${SWIRE_KB.projects}\n\nSwire RE focuses on utility-scale renewable projects that deliver long-term value to stakeholders while contributing to global clean energy goals.`;
+      } else if (lowerQuery.includes('capabilit')) {
+        swireResponse = `**Swire RE Technical Capabilities**\n\n${SWIRE_KB.capabilities}\n\nThe company has expertise across the full project lifecycle from feasibility studies to long-term operations and maintenance.`;
+      } else if (lowerQuery.includes('sustainab') || lowerQuery.includes('esg')) {
+        swireResponse = `**Sustainability & ESG Commitments**\n\n${SWIRE_KB.sustainability}\n\nSwire RE is committed to environmental stewardship, community partnership, and transparent governance practices.`;
+      } else {
+        swireResponse = `**About Swire Renewable Energy**\n\n${SWIRE_KB.company}\n\nKey focus areas include onshore and offshore wind development, utility-scale solar projects, energy storage solutions, and grid integration services. The company operates with core values of environmental stewardship, community partnership, technical excellence, and financial sustainability.`;
+      }
+      
+      return res.status(200).json({
+        response: swireResponse + azureContext,
+        sessionId: `session-${Date.now()}`,
+        agentId,
+        source: 'swire-kb'
+      });
+    }
     
     const client = getBedrockClient();
+    
+    const enhancedQuery = query + azureContext;
     
     const command = new InvokeAgentCommand({
       agentId,
       agentAliasId: CONFIG.BEDROCK.AGENT_ALIAS_ID,
       sessionId: `session-${Date.now()}`,
-      inputText: query,
+      inputText: enhancedQuery,
     });
 
     const response = await client.send(command);
