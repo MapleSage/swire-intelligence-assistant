@@ -34,11 +34,13 @@ const getAzureSearchClient = () => {
 
 // Swire Renewable Energy knowledge base data
 const SWIRE_KB = {
-  company: "Swire Renewable Energy is a leading renewable energy company focused on developing, constructing, and operating wind and solar projects across North America and Asia-Pacific regions.",
-  formosa: "Formosa Offshore Wind is Swire RE's flagship project located in Taiwan Strait with 376 MW capacity in Phase 1 and 376 MW in Phase 2. It uses Siemens Gamesa offshore turbines and is a joint venture with Ørsted.",
-  projects: "Current projects include Formosa Offshore Wind (Taiwan), North American Wind Portfolio (1,200+ MW), Utility-Scale Solar Development (500+ MW pipeline), and Battery Energy Storage Systems.",
-  capabilities: "Swire RE specializes in onshore/offshore wind development, utility-scale solar PV systems, energy storage integration, and grid integration services.",
-  sustainability: "Committed to net-zero emissions by 2030, science-based targets, biodiversity protection, and community engagement programs."
+  company: "Swire Renewable Energy (Swire RE) is a leading renewable energy developer and operator with headquarters in Hong Kong. The company is part of the Swire Group and focuses on developing, constructing, and operating wind and solar projects across Asia-Pacific and North America.",
+  leadership: "Rayan is a key executive at Swire Renewable Energy, leading strategic initiatives and project development across the company's renewable energy portfolio.",
+  formosa: "Formosa Offshore Wind is Swire RE's flagship project located in Taiwan Strait with 376 MW capacity in Phase 1 and 376 MW in Phase 2. It uses Siemens Gamesa offshore turbines and is a joint venture with Ørsted and Macquarie Capital.",
+  projects: "Current projects include Formosa Offshore Wind (Taiwan - 752MW total), North American Wind Portfolio (1,200+ MW), Utility-Scale Solar Development (500+ MW pipeline), and Battery Energy Storage Systems across multiple markets.",
+  capabilities: "Swire RE specializes in offshore wind development, onshore wind farms, utility-scale solar PV systems, energy storage integration, grid connection services, and long-term asset management.",
+  sustainability: "Committed to net-zero emissions by 2030, science-based climate targets, marine biodiversity protection, community engagement programs, and sustainable supply chain practices.",
+  locations: "Operations in Hong Kong, Taiwan, United States, Canada, and expanding into other Asia-Pacific markets including Japan and Australia."
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -79,10 +81,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Check if query is about Swire and provide direct response
     const lowerQuery = query.toLowerCase();
-    if (lowerQuery.includes('swire')) {
+    if (lowerQuery.includes('swire') || lowerQuery.includes('rayan') || lowerQuery.includes('swire-re')) {
       let swireResponse = '';
       
-      if (lowerQuery.includes('formosa')) {
+      if (lowerQuery.includes('rayan')) {
+        swireResponse = `**Rayan - Swire Renewable Energy Leadership**\n\n${SWIRE_KB.leadership}\n\n**About Swire Renewable Energy:**\n${SWIRE_KB.company}\n\n**Key Projects:** ${SWIRE_KB.projects}`;
+      } else if (lowerQuery.includes('formosa')) {
         swireResponse = `**Formosa Offshore Wind Project**\n\n${SWIRE_KB.formosa}\n\nThis is one of Taiwan's largest offshore wind developments and represents Swire RE's commitment to advancing renewable energy in the Asia-Pacific region.`;
       } else if (lowerQuery.includes('project')) {
         swireResponse = `**Swire Renewable Energy Projects**\n\n${SWIRE_KB.projects}\n\nSwire RE focuses on utility-scale renewable projects that deliver long-term value to stakeholders while contributing to global clean energy goals.`;
@@ -90,8 +94,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         swireResponse = `**Swire RE Technical Capabilities**\n\n${SWIRE_KB.capabilities}\n\nThe company has expertise across the full project lifecycle from feasibility studies to long-term operations and maintenance.`;
       } else if (lowerQuery.includes('sustainab') || lowerQuery.includes('esg')) {
         swireResponse = `**Sustainability & ESG Commitments**\n\n${SWIRE_KB.sustainability}\n\nSwire RE is committed to environmental stewardship, community partnership, and transparent governance practices.`;
+      } else if (lowerQuery.includes('location') || lowerQuery.includes('office')) {
+        swireResponse = `**Swire RE Global Presence**\n\n${SWIRE_KB.locations}\n\nSwire RE maintains a strong presence across key renewable energy markets in Asia-Pacific and North America.`;
       } else {
-        swireResponse = `**About Swire Renewable Energy**\n\n${SWIRE_KB.company}\n\nKey focus areas include onshore and offshore wind development, utility-scale solar projects, energy storage solutions, and grid integration services. The company operates with core values of environmental stewardship, community partnership, technical excellence, and financial sustainability.`;
+        swireResponse = `**About Swire Renewable Energy**\n\n${SWIRE_KB.company}\n\n**Global Operations:** ${SWIRE_KB.locations}\n\n**Key Projects:** ${SWIRE_KB.projects}\n\nSwire RE operates with core values of environmental stewardship, community partnership, technical excellence, and financial sustainability.`;
       }
       
       return res.status(200).json({
