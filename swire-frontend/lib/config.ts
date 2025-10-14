@@ -5,7 +5,7 @@ export const CONFIG = {
   },
   BEDROCK: {
     AGENT_ID: 'XMJHPK00RO',
-    AGENT_ALIAS_ID: 'TSTALIASID',
+    AGENT_ALIAS_ID: 'PDGGKSDLVP',
   },
   COGNITO: {
     USER_POOL_ID: process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || 'us-east-1_bdqsU9GjR',
