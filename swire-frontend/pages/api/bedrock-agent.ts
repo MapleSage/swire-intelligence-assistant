@@ -4,6 +4,25 @@ import {
   InvokeAgentCommand,
 } from '@aws-sdk/client-bedrock-agent-runtime';
 
+// Basic fallback responses
+const getBasicResponse = (query: string): string => {
+  const lowerQuery = query.toLowerCase();
+  
+  if (lowerQuery.includes('company') || lowerQuery.includes('about')) {
+    return 'Swire Renewable Energy is a leading renewable energy developer and operator headquartered in Hong Kong. We are part of the Swire Group and focus on developing, constructing, and operating wind and solar projects across Asia-Pacific and North America.';
+  }
+  
+  if (lowerQuery.includes('project') || lowerQuery.includes('wind') || lowerQuery.includes('solar')) {
+    return 'Our key projects include Formosa Offshore Wind in Taiwan (752MW total capacity), North American Wind Portfolio (1,200+ MW), and Utility-Scale Solar Development (500+ MW pipeline).';
+  }
+  
+  if (lowerQuery.includes('ceo') || lowerQuery.includes('leadership') || lowerQuery.includes('ryan')) {
+    return 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy. Under his leadership, the company is evolving to become a leading renewable energy inspection, repair and maintenance business.';
+  }
+  
+  return 'Hello! I am SageGreen, your Swire Renewable Energy assistant. I can help you with questions about our wind and solar projects, operations, safety protocols, and more. How can I assist you today?';
+};
+
 const getBedrockClient = () => {
   const region = process.env.AWS_REGION || process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
   
@@ -158,6 +177,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Query is required' });
   }
 
+  // Log environment info for debugging
+  console.log('Environment:', {
+    isVercel: !!process.env.VERCEL,
+    hasAwsCredentials: !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY),
+    hasAzureConfig: !!(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_KEY),
+    region: process.env.AWS_REGION || process.env.NEXT_PUBLIC_AWS_REGION
+  });
+  
   console.log('Processing query:', query);
 
   // If forceAzure flag is set, skip Bedrock
@@ -227,18 +254,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (azureError: any) {
       console.error('❌ Azure OpenAI fallback also failed:', azureError.message);
       
-      return res.status(500).json({
-        error: 'Both services unavailable',
-        details: {
-          bedrock: bedrockError.message,
-          azure: azureError.message
-        },
-        response: "I apologize, but I'm experiencing technical difficulties. Please try again in a moment."
+      // Final fallback with basic response
+      const basicResponse = getBasicResponse(query);
+      return res.status(200).json({
+        response: basicResponse,
+        source: 'basic-fallback',
+        model: 'local',
+        error: 'Both AI services unavailable'
       });
     }
   }
 
-  return res.status(500).json({
-    error: 'No response generated'
+  // Should not reach here, but provide fallback
+  const basicResponse = getBasicResponse(query);
+  return res.status(200).json({
+    response: basicResponse,
+    source: 'final-fallback',
+    model: 'local'
   });
 }
