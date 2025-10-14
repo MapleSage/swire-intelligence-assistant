@@ -4,19 +4,11 @@ import { SearchClient, AzureKeyCredential } from '@azure/search-documents';
 import { CONFIG } from '../../lib/config';
 
 const getBedrockClient = () => {
-  const region = CONFIG.AWS.REGION;
-  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-  
-  if (!accessKeyId || !secretAccessKey) {
-    throw new Error('AWS credentials not configured');
-  }
-  
   return new BedrockAgentRuntimeClient({
-    region,
+    region: process.env.AWS_REGION || 'us-east-1',
     credentials: {
-      accessKeyId,
-      secretAccessKey,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
     },
   });
 };
@@ -43,85 +35,87 @@ const SWIRE_KB = {
   locations: "Operations in Hong Kong, Taiwan, United States, Canada, and expanding into other Asia-Pacific markets including Japan and Australia."
 };
 
+// Simple knowledge base search function
+const searchKnowledgeBase = (query: string): string => {
+  const lowerQuery = query.toLowerCase();
+  
+  if (lowerQuery.includes('ceo') || lowerQuery.includes('leadership') || lowerQuery.includes('ryan smith')) {
+    return SWIRE_KB.leadership;
+  }
+  if (lowerQuery.includes('formosa') || lowerQuery.includes('taiwan')) {
+    return SWIRE_KB.formosa;
+  }
+  if (lowerQuery.includes('project') || lowerQuery.includes('wind') || lowerQuery.includes('solar')) {
+    return SWIRE_KB.projects;
+  }
+  if (lowerQuery.includes('sustainability') || lowerQuery.includes('net-zero') || lowerQuery.includes('climate')) {
+    return SWIRE_KB.sustainability;
+  }
+  if (lowerQuery.includes('location') || lowerQuery.includes('office') || lowerQuery.includes('where')) {
+    return SWIRE_KB.locations;
+  }
+  if (lowerQuery.includes('capability') || lowerQuery.includes('service') || lowerQuery.includes('what do')) {
+    return SWIRE_KB.capabilities;
+  }
+  
+  return SWIRE_KB.company;
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const { query, agentId = CONFIG.BEDROCK.AGENT_ID } = req.body;
-    
-    if (!query) {
-      return res.status(400).json({ error: 'Query is required' });
-    }
+  const { query, agentId = CONFIG.BEDROCK.AGENT_ID } = req.body;
+  
+  if (!query) {
+    return res.status(400).json({ error: 'Query is required' });
+  }
 
-    // Search Azure Knowledge Base first
-    let azureContext = '';
-    const searchClient = getAzureSearchClient();
-    
-    if (searchClient) {
-      try {
-        const searchResults = await searchClient.search(query, {
-          top: 3,
-          select: ['content', 'title']
-        });
-        
-        const results = [];
-        for await (const result of searchResults.results) {
-          results.push(result.document);
-        }
-        
-        if (results.length > 0) {
-          azureContext = `\n\nAdditional context from knowledge base:\n${results.map((r: any) => `• ${r.title}: ${r.content}`).join('\n')}`;
-        }
-      } catch (azureError) {
-        console.log('Azure search error:', azureError);
-      }
-    }
-
-    // Check if query is about Swire and provide direct response
-    const lowerQuery = query.toLowerCase();
-    if (lowerQuery.includes('swire') || lowerQuery.includes('rayan') || lowerQuery.includes('swire-re')) {
-      let swireResponse = '';
-      
-      if (lowerQuery.includes('ryan') || lowerQuery.includes('smith') || lowerQuery.includes('ceo')) {
-        swireResponse = `**Ryan Smith - CEO, Swire Renewable Energy**\n\n${SWIRE_KB.leadership}\n\n**CEO Vision:** "We are entering an exciting phase of our company's journey - continuing our evolutionary path to become a leading renewable energy inspection, repair and maintenance business, and ultimately a renewable energy asset manager. As an independent company, we are now better positioned to adapt and grow with the rapidly evolving renewable energy market."\n\n**About Swire Renewable Energy:**\n${SWIRE_KB.company}`;
-      } else if (lowerQuery.includes('formosa')) {
-        swireResponse = `**Formosa Offshore Wind Project**\n\n${SWIRE_KB.formosa}\n\nThis is one of Taiwan's largest offshore wind developments and represents Swire RE's commitment to advancing renewable energy in the Asia-Pacific region.`;
-      } else if (lowerQuery.includes('project')) {
-        swireResponse = `**Swire Renewable Energy Projects**\n\n${SWIRE_KB.projects}\n\nSwire RE focuses on utility-scale renewable projects that deliver long-term value to stakeholders while contributing to global clean energy goals.`;
-      } else if (lowerQuery.includes('capabilit')) {
-        swireResponse = `**Swire RE Technical Capabilities**\n\n${SWIRE_KB.capabilities}\n\nThe company has expertise across the full project lifecycle from feasibility studies to long-term operations and maintenance.`;
-      } else if (lowerQuery.includes('sustainab') || lowerQuery.includes('esg')) {
-        swireResponse = `**Sustainability & ESG Commitments**\n\n${SWIRE_KB.sustainability}\n\nSwire RE is committed to environmental stewardship, community partnership, and transparent governance practices.`;
-      } else if (lowerQuery.includes('location') || lowerQuery.includes('office')) {
-        swireResponse = `**Swire RE Global Presence**\n\n${SWIRE_KB.locations}\n\nSwire RE maintains a strong presence across key renewable energy markets in Asia-Pacific and North America.`;
-      } else {
-        swireResponse = `**About Swire Renewable Energy**\n\n${SWIRE_KB.company}\n\n**Global Operations:** ${SWIRE_KB.locations}\n\n**Key Projects:** ${SWIRE_KB.projects}\n\nSwire RE operates with core values of environmental stewardship, community partnership, technical excellence, and financial sustainability.`;
-      }
-      
-      return res.status(200).json({
-        response: swireResponse + azureContext,
-        sessionId: `session-${Date.now()}`,
-        agentId,
-        source: 'swire-kb'
+  // Search Azure Knowledge Base first
+  let azureContext = '';
+  const searchClient = getAzureSearchClient();
+  
+  if (searchClient) {
+    try {
+      const searchResults = await searchClient.search(query, {
+        top: 3,
+        select: ['content', 'title']
       });
+      
+      const results = [];
+      for await (const result of searchResults.results) {
+        results.push(result.document);
+      }
+      
+      if (results.length > 0) {
+        azureContext = results.map((r: any) => `${r.title}: ${r.content}`).join('\n');
+      }
+    } catch (azureError) {
+      console.log('Azure search unavailable');
     }
-    
+  }
+
+  // Try Bedrock Agent first, fallback to local knowledge base
+  try {
     const client = getBedrockClient();
+    const enhancedQuery = azureContext ? `${query}\n\nContext: ${azureContext}` : query;
     
-    const enhancedQuery = query + azureContext;
+    console.log('Attempting Bedrock connection:', {
+      agentId: process.env.BEDROCK_AGENT_ID,
+      agentAliasId: process.env.BEDROCK_AGENT_ALIAS_ID,
+      region: process.env.AWS_REGION
+    });
     
     const command = new InvokeAgentCommand({
-      agentId,
-      agentAliasId: CONFIG.BEDROCK.AGENT_ALIAS_ID,
+      agentId: process.env.BEDROCK_AGENT_ID || CONFIG.BEDROCK.AGENT_ID,
+      agentAliasId: process.env.BEDROCK_AGENT_ALIAS_ID || CONFIG.BEDROCK.AGENT_ALIAS_ID,
       sessionId: `session-${Date.now()}`,
       inputText: enhancedQuery,
     });
 
     const response = await client.send(command);
     
-    // Process the streaming response
     let fullResponse = '';
     if (response.completion) {
       const decoder = new TextDecoder();
@@ -132,18 +126,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    res.status(200).json({
-      response: fullResponse || 'No response from agent',
-      sessionId: `session-${Date.now()}`,
-      agentId
-    });
-
+    if (fullResponse) {
+      return res.status(200).json({
+        response: fullResponse,
+        sessionId: `session-${Date.now()}`,
+        agentId,
+        source: 'bedrock'
+      });
+    }
   } catch (error: any) {
-    console.error('Bedrock agent error:', error);
-    res.status(500).json({ 
-      error: 'Bedrock agent failed',
+    console.error('Bedrock connection failed:', {
+      code: error.code,
       message: error.message,
-      response: 'I apologize, but I encountered an error connecting to the Bedrock agent. Please try again.'
+      statusCode: error.$metadata?.httpStatusCode
     });
   }
+
+  // Fallback to local knowledge base
+  const fallbackResponse = azureContext || searchKnowledgeBase(query);
+  
+  res.status(200).json({
+    response: fallbackResponse,
+    sessionId: `session-${Date.now()}`,
+    agentId,
+    source: 'fallback'
+  });
 }

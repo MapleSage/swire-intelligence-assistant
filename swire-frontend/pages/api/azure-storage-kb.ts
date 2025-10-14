@@ -67,7 +67,7 @@ Provide helpful guidance about Swire's wind energy services, safety procedures, 
     });
 
     const command = new InvokeModelCommand({
-      modelId: 'anthropic.claude-3-5-haiku-20241022-v1:0',
+      modelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
       body: JSON.stringify({
         messages: [{ role: 'user', content: enhancedPrompt }],
         max_tokens: 1000,

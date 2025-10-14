@@ -31,7 +31,7 @@ const SwireChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm SageGreen, your renewable energy AI assistant with industry knowledge base access. I can help you with:\n\n• **Financial Analytics** - Revenue, costs, and ROI analysis\n• **Operations Data** - Man-hours, site metrics, and performance\n• **Safety Management** - PPE requirements and safety protocols\n• **Dashboard Insights** - Energy production and efficiency metrics\n• **Technical Support** - Wind and solar system guidance\n\nI have access to sample industry data for demonstrations. What would you like to explore?",
+      content: "Hello! I'm Swire Intelligence Assistant. I'm here to help you with any questions about Swire Renewable Energy's finance, operations, safety, and HR matters. How can I assist you today?",
       sender: "assistant",
       timestamp: new Date(),
     },
@@ -71,7 +71,7 @@ const SwireChatInterface: React.FC = () => {
       // Get access token from Amplify session
       const accessToken = session?.tokens?.accessToken?.toString();
       
-      const response = await fetch("/api/simple-chat", {
+      const response = await fetch("/api/bedrock-agent", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
