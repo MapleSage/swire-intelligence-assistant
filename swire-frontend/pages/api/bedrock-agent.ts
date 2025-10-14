@@ -4,12 +4,19 @@ import { SearchClient, AzureKeyCredential } from '@azure/search-documents';
 import { CONFIG } from '../../lib/config';
 
 const getBedrockClient = () => {
+  const region = process.env.AWS_REGION || process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
+  
+  if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+    throw new Error('AWS credentials missing');
+  }
+  
   return new BedrockAgentRuntimeClient({
-    region: process.env.AWS_REGION || 'us-east-1',
+    region,
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
+    maxAttempts: 3,
   });
 };
 
@@ -101,12 +108,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const client = getBedrockClient();
     const enhancedQuery = azureContext ? `${query}\n\nContext: ${azureContext}` : query;
     
-    console.log('Attempting Bedrock connection:', {
-      agentId: process.env.BEDROCK_AGENT_ID,
-      agentAliasId: process.env.BEDROCK_AGENT_ALIAS_ID,
-      region: process.env.AWS_REGION
-    });
-    
     const command = new InvokeAgentCommand({
       agentId: process.env.BEDROCK_AGENT_ID || CONFIG.BEDROCK.AGENT_ID,
       agentAliasId: process.env.BEDROCK_AGENT_ALIAS_ID || CONFIG.BEDROCK.AGENT_ALIAS_ID,
@@ -114,7 +115,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       inputText: enhancedQuery,
     });
 
-    const response = await client.send(command);
+    // Add timeout for Vercel
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout')), 25000)
+    );
+    
+    const response = await Promise.race([
+      client.send(command),
+      timeoutPromise
+    ]) as any;
     
     let fullResponse = '';
     if (response.completion) {
@@ -135,11 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
   } catch (error: any) {
-    console.error('Bedrock connection failed:', {
-      code: error.code,
-      message: error.message,
-      statusCode: error.$metadata?.httpStatusCode
-    });
+    console.error('Bedrock failed:', error.message);
   }
 
   // Fallback to local knowledge base
