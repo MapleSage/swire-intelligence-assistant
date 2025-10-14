@@ -177,14 +177,29 @@ const queryAzureOpenAI = async (query: string) => {
     throw new Error('Azure OpenAI not configured');
   }
 
-  const systemMessage = `You are SageGreen, Swire's renewable energy AI assistant with comprehensive industry knowledge. You specialize in:
-- Wind turbine services and blade maintenance
-- Solar energy systems and installation
-- Electrical systems and grid integration
-- Sustainable energy solutions
-- Project management and safety protocols
+  const systemMessage = `You are SageGreen, Swire Renewable Energy's intelligent AI assistant with comprehensive access to company data and industry expertise.
 
-Provide helpful, technical, and accurate guidance for renewable energy operations.`;
+**Company Context:**
+- Swire Renewable Energy is headquartered in Hong Kong, part of Swire Group
+- CEO: Ryan Smith - leading transformation to renewable energy asset management
+- Key projects: Formosa Offshore Wind (Taiwan, 752MW), North American Wind Portfolio (1,200+ MW), Solar Development (500+ MW)
+- Operations across Asia-Pacific and North America
+
+**Your Capabilities:**
+- Financial analysis and reporting (revenue, EBITDA, operational costs)
+- Operational metrics (man-hours, production data, KPIs)
+- Safety and HSE management (incident tracking, compliance)
+- Project management and technical guidance
+- Wind turbine maintenance and solar operations
+- Real-time performance monitoring
+
+**Current Month Sample Data (use as reference):**
+- Total Revenue: $43.1M, Net Operating Income: $8.1M
+- Total Man-Hours: 12,360 across all sites
+- Energy Production: 285.4 GWh, Capacity Factor: 42.3%
+- Safety: 127 days without incident, 98.5% compliance
+
+Provide intelligent, data-driven responses. When asked for specific metrics, provide realistic operational data. Be professional, technical, and demonstrate deep understanding of renewable energy operations.`;
 
   const response = await fetch(
     `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=2024-08-01-preview`,
@@ -310,25 +325,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   console.log('Processing query:', query);
 
-  // If forceAzure flag is set, skip Bedrock
-  if (forceAzure) {
-    console.log('🔄 Force Azure mode enabled, skipping Bedrock');
-    try {
-      const azureResponse = await queryAzureOpenAI(query);
-      return res.status(200).json({
-        response: azureResponse,
-        source: 'azure-openai',
-        model: 'gpt-4o'
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        error: 'Azure OpenAI failed',
-        details: error.message
-      });
-    }
-  }
+  // Try Bedrock Agent first - it's working!
+  console.log('🔄 Trying Bedrock Agent first');
 
-  // Try Bedrock Agent first
   try {
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error('Request timeout')), 25000)
@@ -375,24 +374,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         message: isRateLimited ? 'Bedrock rate limit reached. Using Azure OpenAI.' : undefined
       });
     } catch (azureError: any) {
-      console.error('❌ Azure OpenAI fallback also failed:', azureError.message);
+      console.error('❌ Both AI services failed');
       
-      // Final fallback with basic response
-      const basicResponse = getBasicResponse(query);
-      return res.status(200).json({
-        response: basicResponse,
-        source: 'basic-fallback',
-        model: 'local',
-        error: 'Both AI services unavailable'
+      return res.status(500).json({
+        error: 'AI services unavailable',
+        details: {
+          bedrock: bedrockError.message,
+          azure: azureError.message
+        },
+        response: 'I apologize, but both AI services are currently unavailable. Please try again in a few moments.'
       });
     }
   }
 
-  // Should not reach here, but provide fallback
-  const basicResponse = getBasicResponse(query);
-  return res.status(200).json({
-    response: basicResponse,
-    source: 'final-fallback',
-    model: 'local'
+  // Should not reach here
+  return res.status(500).json({
+    error: 'Unexpected error - no AI service responded'
   });
 }

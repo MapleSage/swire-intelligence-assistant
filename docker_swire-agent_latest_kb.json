@@ -1,0 +1,108 @@
+{
+  "kb_metadata": {
+    "name": "Swire Agent Docker Knowledge Base",
+    "version": "1.0",
+    "created_date": "2025-10-10T19:35:00+05:30",
+    "description": "Docker container manifest and deployment information for Swire Agent",
+    "category": "infrastructure"
+  },
+  "docker_manifest": {
+    "repository": "swire-agent",
+    "tag": {
+      "name": "latest",
+      "creationDate": "2025-10-10T19:35:00+05:30",
+      "lastUpdatedDate": "2025-10-10T19:35:00+05:30"
+    },
+    "digest": "sha256:f4721c2b089a8ac73e21447f8deed967df23f45a9cbd0ae643b363fdacf16952",
+    "platform": "linux/amd64",
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "runId": "ca1"
+  },
+  "container_config": {
+    "mediaType": "application/vnd.docker.container.image.v1+json",
+    "size": 8030,
+    "digest": "sha256:dd89e00954c3122ea090a6d38d52387d4a4cc17dd652fc171fd50d643222ba5a"
+  },
+  "layers": [
+    {
+      "layer_id": 1,
+      "size": 30781333,
+      "digest": "sha256:b96413fb491a5ed179bb2746ff3be6cbddd72e14c6503bea80d58e579a3b92bc",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Base OS layer"
+    },
+    {
+      "layer_id": 2,
+      "size": 4250386,
+      "digest": "sha256:c72c567266265eaf3c81cecf291e32dc35cb03f44a34cc37c4bb2c3f1ca6741c",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "System dependencies"
+    },
+    {
+      "layer_id": 3,
+      "size": 14362228,
+      "digest": "sha256:76d93c681ade9d7ff7e4e590094f416d05d02ce51cb023dbb97acd48c3073470",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Python runtime and libraries"
+    },
+    {
+      "layer_id": 4,
+      "size": 250,
+      "digest": "sha256:80061c640d6316e0810fd1007261f33680529077a173449bba4b55579c66db45",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Configuration files"
+    },
+    {
+      "layer_id": 5,
+      "size": 90,
+      "digest": "sha256:13a7c918d75f1268d0dc1adfc68fe224586aa11337e87a0cf052583a94d9b107",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Environment setup"
+    },
+    {
+      "layer_id": 6,
+      "size": 56088556,
+      "digest": "sha256:b1c4b88e21230d5d0488680cee275b71464f50e68b08b0c856b973072bdea493",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Application dependencies"
+    },
+    {
+      "layer_id": 7,
+      "size": 363,
+      "digest": "sha256:ad81cbe81dc28bb62a41bf13468ce547732e27bc1025713c5b18108e9acbaed8",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Application configuration"
+    },
+    {
+      "layer_id": 8,
+      "size": 4196084622,
+      "digest": "sha256:bfe0b1d97535074c879f0b8ec39cb1b42fef4464b0eb481a6729d3ea97eafe60",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Main application layer (Swire Agent Core)"
+    },
+    {
+      "layer_id": 9,
+      "size": 38991,
+      "digest": "sha256:f1294123c4526fb38768f1e4f455ddad35843553f33457591836fe2541c1b99c",
+      "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+      "description": "Final application setup"
+    }
+  ],
+  "deployment_info": {
+    "total_size_bytes": 4301518023,
+    "total_size_mb": 4102.3,
+    "layer_count": 9,
+    "architecture": "linux/amd64",
+    "registry": "Azure Container Registry",
+    "deployment_status": "active"
+  },
+  "searchable_content": [
+    "swire-agent docker container",
+    "linux/amd64 platform",
+    "Azure Container Registry deployment",
+    "multi-layer docker image",
+    "Swire Agent Core application",
+    "container manifest v2",
+    "production deployment"
+  ]
+}
