@@ -8,16 +8,24 @@ import {
 const getBasicResponse = (query: string): string => {
   const lowerQuery = query.toLowerCase();
   
-  if (lowerQuery.includes('company') || lowerQuery.includes('about')) {
-    return 'Swire Renewable Energy is a leading renewable energy developer and operator headquartered in Hong Kong. We are part of the Swire Group and focus on developing, constructing, and operating wind and solar projects across Asia-Pacific and North America.';
+  if (lowerQuery.includes('management') || lowerQuery.includes('team') || lowerQuery.includes('leadership')) {
+    return 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy. Under his leadership, the company is evolving to become a leading renewable energy inspection, repair and maintenance business, and ultimately a renewable energy asset manager. The leadership team focuses on combining expertise with a commitment to health, safety and quality, positioning Swire RE as a strategic partner across the full renewable energy supply chain.';
+  }
+  
+  if (lowerQuery.includes('ceo') || lowerQuery.includes('ryan smith') || lowerQuery.includes('ryan')) {
+    return 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy. Under his leadership, the company is evolving to become a leading renewable energy inspection, repair and maintenance business.';
   }
   
   if (lowerQuery.includes('project') || lowerQuery.includes('wind') || lowerQuery.includes('solar')) {
     return 'Our key projects include Formosa Offshore Wind in Taiwan (752MW total capacity), North American Wind Portfolio (1,200+ MW), and Utility-Scale Solar Development (500+ MW pipeline).';
   }
   
-  if (lowerQuery.includes('ceo') || lowerQuery.includes('leadership') || lowerQuery.includes('ryan')) {
-    return 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy. Under his leadership, the company is evolving to become a leading renewable energy inspection, repair and maintenance business.';
+  if (lowerQuery.includes('formosa') || lowerQuery.includes('taiwan')) {
+    return 'Formosa Offshore Wind is Swire RE\'s flagship project located in Taiwan Strait with 376 MW capacity in Phase 1 and 376 MW in Phase 2. It uses Siemens Gamesa offshore turbines and is a joint venture with Ørsted and Macquarie Capital.';
+  }
+  
+  if (lowerQuery.includes('company') || lowerQuery.includes('about') || lowerQuery.includes('swire')) {
+    return 'Swire Renewable Energy is a leading renewable energy developer and operator headquartered in Hong Kong. We are part of the Swire Group and focus on developing, constructing, and operating wind and solar projects across Asia-Pacific and North America.';
   }
   
   return 'Hello! I am SageGreen, your Swire Renewable Energy assistant. I can help you with questions about our wind and solar projects, operations, safety protocols, and more. How can I assist you today?';
