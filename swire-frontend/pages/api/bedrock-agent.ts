@@ -4,10 +4,123 @@ import {
   InvokeAgentCommand,
 } from '@aws-sdk/client-bedrock-agent-runtime';
 
+// Mock data for demo purposes
+const getMockFinancialData = () => {
+  const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+  return `**${currentMonth} Financial Summary**
+
+**Revenue:**
+• Formosa Phase 1: $12.4M
+• Formosa Phase 2: $8.7M  
+• North American Portfolio: $15.2M
+• Solar Projects: $6.8M
+• **Total Revenue: $43.1M**
+
+**Operating Expenses:**
+• Operations & Maintenance: $18.5M
+• Personnel Costs: $12.3M
+• Equipment & Materials: $4.2M
+• **Total OpEx: $35.0M**
+
+**Net Operating Income: $8.1M**
+**EBITDA Margin: 18.8%**
+
+*Note: This is demonstration data for pilot purposes.*`;
+};
+
+const getMockManHoursData = () => {
+  return `**Man-Hours by Site (Current Month)**
+
+**Offshore Wind:**
+• Formosa Phase 1: 2,840 hours
+• Formosa Phase 2: 1,920 hours
+
+**Onshore Wind:**
+• Texas Wind Farm A: 1,560 hours
+• Oklahoma Wind Farm B: 1,240 hours
+• Kansas Wind Farm C: 980 hours
+
+**Solar Projects:**
+• California Solar Array: 720 hours
+• Nevada Solar Farm: 640 hours
+
+**Maintenance & Inspection:**
+• Blade Maintenance: 1,180 hours
+• Electrical Systems: 860 hours
+• Safety Inspections: 420 hours
+
+**Total Man-Hours: 12,360 hours**
+**Safety Record: 0 incidents this month**
+
+*Note: This is demonstration data for pilot purposes.*`;
+};
+
 // Basic fallback responses
 const getBasicResponse = (query: string): string => {
   const lowerQuery = query.toLowerCase();
   
+  // Financial queries
+  if (lowerQuery.includes('financial') || lowerQuery.includes('finance') || lowerQuery.includes('revenue') || lowerQuery.includes('summary') || lowerQuery.includes('budget')) {
+    return getMockFinancialData();
+  }
+  
+  // HR and operational queries
+  if (lowerQuery.includes('man-hours') || lowerQuery.includes('manhours') || lowerQuery.includes('hours') || lowerQuery.includes('site') || lowerQuery.includes('workforce')) {
+    return getMockManHoursData();
+  }
+  
+  // Safety queries
+  if (lowerQuery.includes('safety') || lowerQuery.includes('incident') || lowerQuery.includes('hse') || lowerQuery.includes('accident')) {
+    return `**Safety & HSE Dashboard**
+
+**Current Month Performance:**
+• Days without incident: 127 days
+• Total safety inspections: 45
+• Safety training hours: 1,240
+• Near-miss reports: 3 (all resolved)
+
+**Key Safety Metrics:**
+• Lost Time Injury Rate: 0.0
+• Total Recordable Incident Rate: 0.12
+• Safety compliance score: 98.5%
+• PPE compliance: 100%
+
+**Recent Safety Initiatives:**
+• Blade maintenance safety protocol update
+• Emergency response drill (all sites)
+• New fall protection equipment deployed
+
+*Safety is our #1 priority. Zero harm is our goal.*`;
+  }
+  
+  // Performance and KPI queries
+  if (lowerQuery.includes('performance') || lowerQuery.includes('kpi') || lowerQuery.includes('metrics') || lowerQuery.includes('production')) {
+    return `**Operational Performance Dashboard**
+
+**Energy Production (Current Month):**
+• Total Generation: 285.4 GWh
+• Capacity Factor: 42.3%
+• Availability: 96.8%
+
+**By Technology:**
+• Offshore Wind: 168.2 GWh (59%)
+• Onshore Wind: 89.7 GWh (31%)
+• Solar PV: 27.5 GWh (10%)
+
+**Key Performance Indicators:**
+• Turbine Availability: 97.2%
+• Grid Connection Uptime: 99.1%
+• Maintenance Efficiency: 94.5%
+• Cost per MWh: $28.40
+
+**Environmental Impact:**
+• CO2 Avoided: 142,700 tons
+• Homes Powered: ~71,350
+
+*Note: This is demonstration data for pilot purposes.*`;
+  }
+  
+  // Management and leadership
   if (lowerQuery.includes('management') || lowerQuery.includes('team') || lowerQuery.includes('leadership')) {
     return 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy. Under his leadership, the company is evolving to become a leading renewable energy inspection, repair and maintenance business, and ultimately a renewable energy asset manager. The leadership team focuses on combining expertise with a commitment to health, safety and quality, positioning Swire RE as a strategic partner across the full renewable energy supply chain.';
   }
@@ -16,6 +129,7 @@ const getBasicResponse = (query: string): string => {
     return 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy. Under his leadership, the company is evolving to become a leading renewable energy inspection, repair and maintenance business.';
   }
   
+  // Projects
   if (lowerQuery.includes('project') || lowerQuery.includes('wind') || lowerQuery.includes('solar')) {
     return 'Our key projects include Formosa Offshore Wind in Taiwan (752MW total capacity), North American Wind Portfolio (1,200+ MW), and Utility-Scale Solar Development (500+ MW pipeline).';
   }
@@ -24,11 +138,12 @@ const getBasicResponse = (query: string): string => {
     return 'Formosa Offshore Wind is Swire RE\'s flagship project located in Taiwan Strait with 376 MW capacity in Phase 1 and 376 MW in Phase 2. It uses Siemens Gamesa offshore turbines and is a joint venture with Ørsted and Macquarie Capital.';
   }
   
+  // Company info
   if (lowerQuery.includes('company') || lowerQuery.includes('about') || lowerQuery.includes('swire')) {
     return 'Swire Renewable Energy is a leading renewable energy developer and operator headquartered in Hong Kong. We are part of the Swire Group and focus on developing, constructing, and operating wind and solar projects across Asia-Pacific and North America.';
   }
   
-  return 'Hello! I am SageGreen, your Swire Renewable Energy assistant. I can help you with questions about our wind and solar projects, operations, safety protocols, and more. How can I assist you today?';
+  return 'Hello! I am SageGreen, your Swire Renewable Energy assistant. I can help you with questions about our wind and solar projects, operations, safety protocols, and more. For real-time data like financial summaries or operational metrics, please contact the relevant department directly.';
 };
 
 const getBedrockClient = () => {
