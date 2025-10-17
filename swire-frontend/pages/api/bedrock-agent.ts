@@ -4,6 +4,10 @@ import {
   InvokeAgentCommand,
 } from '@aws-sdk/client-bedrock-agent-runtime';
 
+export const config = {
+  maxDuration: 30,
+};
+
 // Mock data for demo purposes
 const getMockFinancialData = () => {
   const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -165,7 +169,7 @@ const getBedrockClient = () => {
 
 // Simple in-memory rate limiter
 let lastBedrockCall = 0;
-const MIN_BEDROCK_INTERVAL = 2000; // 2 seconds between calls
+const MIN_BEDROCK_INTERVAL = 1000; // 1 second between calls
 
 // Azure OpenAI Fallback
 const queryAzureOpenAI = async (query: string) => {
@@ -330,7 +334,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timeout')), 15000)
+      setTimeout(() => reject(new Error('Request timeout')), 8000)
     );
     
     const response = await Promise.race([
@@ -362,8 +366,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // If rate limited, wait and retry once more
     if (isRateLimited) {
-      console.log('⏳ Rate limited, waiting 3 seconds and retrying...');
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      console.log('⏳ Rate limited, waiting 2 seconds and retrying...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       try {
         const retryResponse = await queryBedrockAgent(query, sessionId, 1);
