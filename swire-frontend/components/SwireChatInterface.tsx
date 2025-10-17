@@ -71,19 +71,61 @@ const SwireChatInterface: React.FC = () => {
       // Get access token from Amplify session
       const accessToken = session?.tokens?.accessToken?.toString();
       
-      const response = await fetch("/api/bedrock-agent", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
-        },
-        body: JSON.stringify({ 
-          query: textToSend,
-          model: selectedModel
-        }),
-      });
-
-      const data = await response.json();
+      let response;
+      let data;
+      
+      // Try FastAPI backend first
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      if (backendUrl) {
+        try {
+          response = await fetch(`${backendUrl}/chat`, {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
+            },
+            body: JSON.stringify({ query: textToSend }),
+          });
+          
+          if (response.ok) {
+            data = await response.json();
+          } else {
+            throw new Error(`Backend failed: ${response.status}`);
+          }
+        } catch (backendError) {
+          console.log('Backend failed, trying Azure OpenAI fallback:', backendError);
+          
+          // Fallback to Azure OpenAI via API route
+          response = await fetch("/api/bedrock-agent", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
+            },
+            body: JSON.stringify({ 
+              query: textToSend,
+              model: selectedModel
+            }),
+          });
+          
+          data = await response.json();
+        }
+      } else {
+        // No backend URL, use API route directly
+        response = await fetch("/api/bedrock-agent", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
+          },
+          body: JSON.stringify({ 
+            query: textToSend,
+            model: selectedModel
+          }),
+        });
+        
+        data = await response.json();
+      }
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -94,10 +136,10 @@ const SwireChatInterface: React.FC = () => {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Message error:", error);
+      console.error("All services failed:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I'm sorry, there was an error connecting to the service. Please try again.",
+        content: "I'm sorry, there was an error connecting to all services. Please try again later.",
         sender: "assistant",
         timestamp: new Date(),
       };
