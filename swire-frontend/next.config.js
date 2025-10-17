@@ -10,4 +10,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = nextConfig// Force rebuild Fri Oct 17 21:31:22 IST 2025
