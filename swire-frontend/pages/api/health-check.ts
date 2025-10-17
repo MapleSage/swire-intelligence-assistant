@@ -4,8 +4,8 @@ import { BedrockAgentRuntimeClient, InvokeAgentCommand } from '@aws-sdk/client-b
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const results = {
     timestamp: new Date().toISOString(),
-    bedrock: { status: 'unknown', error: null },
-    azure: { status: 'unknown', error: null },
+    bedrock: { status: 'unknown', error: null as any },
+    azure: { status: 'unknown', error: null as any },
     environment: {
       hasAwsCredentials: !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY),
       hasAzureConfig: !!(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_KEY),
