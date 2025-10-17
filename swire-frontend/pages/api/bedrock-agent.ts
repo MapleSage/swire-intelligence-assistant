@@ -325,12 +325,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   console.log('Processing query:', query);
 
-  // Try Bedrock Agent first - it's working!
+  // Try Bedrock Agent first
   console.log('🔄 Trying Bedrock Agent first');
 
   try {
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timeout')), 25000)
+      setTimeout(() => reject(new Error('Request timeout')), 15000)
     );
     
     const response = await Promise.race([
@@ -356,39 +356,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       name: bedrockError.name,
       message: bedrockError.message,
       statusCode: statusCode,
-      isRateLimited: isRateLimited
+      isRateLimited: isRateLimited,
+      stack: bedrockError.stack?.substring(0, 500)
     });
 
-    // Fallback to Azure
-    console.log('⚠️ Bedrock unavailable, falling back to Azure OpenAI...');
-    
-    try {
-      const azureResponse = await queryAzureOpenAI(query);
+    // If rate limited, wait and retry once more
+    if (isRateLimited) {
+      console.log('⏳ Rate limited, waiting 3 seconds and retrying...');
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
-      console.log('✅ Azure OpenAI fallback successful');
-      return res.status(200).json({
-        response: azureResponse,
-        source: 'azure-openai-fallback',
-        model: 'gpt-4o',
-        fallbackReason: isRateLimited ? 'rate-limit' : bedrockError.name,
-        message: isRateLimited ? 'Bedrock rate limit reached. Using Azure OpenAI.' : undefined
-      });
-    } catch (azureError: any) {
-      console.error('❌ Both AI services failed');
-      
-      return res.status(500).json({
-        error: 'AI services unavailable',
-        details: {
-          bedrock: bedrockError.message,
-          azure: azureError.message
-        },
-        response: 'I apologize, but both AI services are currently unavailable. Please try again in a few moments.'
-      });
+      try {
+        const retryResponse = await queryBedrockAgent(query, sessionId, 1);
+        if (retryResponse?.text) {
+          console.log('✅ Bedrock retry successful');
+          return res.status(200).json({
+            response: retryResponse.text,
+            sessionId: retryResponse.sessionId,
+            source: 'bedrock-agent-retry',
+            model: 'claude-3.5-sonnet-v2'
+          });
+        }
+      } catch (retryError) {
+        console.log('❌ Bedrock retry also failed');
+      }
     }
+    
+    // Use basic fallback response
+    console.log('⚠️ Using basic fallback responses');
+    const fallbackResponse = getBasicResponse(query);
+    
+    return res.status(200).json({
+      response: fallbackResponse,
+      source: 'basic-fallback',
+      model: 'cached-responses',
+      message: isRateLimited ? 'Bedrock rate limit reached. Using cached responses.' : 'Bedrock temporarily unavailable. Using cached responses.'
+    });
   }
 
-  // Should not reach here
-  return res.status(500).json({
-    error: 'Unexpected error - no AI service responded'
+  // Fallback response if nothing else works
+  const fallbackResponse = getBasicResponse(query);
+  return res.status(200).json({
+    response: fallbackResponse,
+    source: 'emergency-fallback',
+    model: 'basic-responses'
   });
 }
