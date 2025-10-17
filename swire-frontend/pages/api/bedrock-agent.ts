@@ -313,95 +313,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { query, sessionId, forceAzure = false } = req.body;
+  const { query } = req.body;
   
   if (!query) {
     return res.status(400).json({ error: 'Query is required' });
   }
 
-  // Log environment info for debugging
-  console.log('Environment:', {
-    isVercel: !!process.env.VERCEL,
-    hasAwsCredentials: !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY),
-    hasAzureConfig: !!(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_KEY),
-    region: process.env.AWS_REGION || process.env.NEXT_PUBLIC_AWS_REGION
-  });
-  
-  console.log('Processing query:', query);
-
-  // Try Bedrock Agent first
-  console.log('🔄 Trying Bedrock Agent first');
-
   try {
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timeout')), 8000)
-    );
+    const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
     
-    const response = await Promise.race([
-      queryBedrockAgent(query, sessionId),
-      timeoutPromise
-    ]) as any;
-    
-    if (response?.text) {
-      console.log('✅ Bedrock Agent response successful');
-      return res.status(200).json({
-        response: response.text,
-        sessionId: response.sessionId,
-        source: 'bedrock-agent',
-        model: 'claude-3.5-sonnet-v2'
-      });
-    }
-
-  } catch (bedrockError: any) {
-    const statusCode = bedrockError.$metadata?.httpStatusCode;
-    const isRateLimited = statusCode === 429 || bedrockError.name === 'ThrottlingException';
-    
-    console.error('❌ Bedrock Agent error:', {
-      name: bedrockError.name,
-      message: bedrockError.message,
-      statusCode: statusCode,
-      isRateLimited: isRateLimited,
-      stack: bedrockError.stack?.substring(0, 500)
+    const client = new BedrockRuntimeClient({
+      region: process.env.AWS_REGION || 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      },
     });
 
-    // If rate limited, wait and retry once more
-    if (isRateLimited) {
-      console.log('⏳ Rate limited, waiting 2 seconds and retrying...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      try {
-        const retryResponse = await queryBedrockAgent(query, sessionId, 1);
-        if (retryResponse?.text) {
-          console.log('✅ Bedrock retry successful');
-          return res.status(200).json({
-            response: retryResponse.text,
-            sessionId: retryResponse.sessionId,
-            source: 'bedrock-agent-retry',
-            model: 'claude-3.5-sonnet-v2'
-          });
-        }
-      } catch (retryError) {
-        console.log('❌ Bedrock retry also failed');
-      }
-    }
+    const command = new InvokeModelCommand({
+      modelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: query }],
+        max_tokens: 2000,
+        anthropic_version: 'bedrock-2023-05-31'
+      }),
+      contentType: 'application/json',
+      accept: 'application/json',
+    });
+
+    const response = await client.send(command);
+    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+
+    return res.status(200).json({
+      response: responseBody.content[0].text,
+      source: 'bedrock-runtime',
+      model: 'claude-3.5-sonnet-v2'
+    });
+
+  } catch (error: any) {
+    console.error('Bedrock error:', error);
     
-    // Use basic fallback response
-    console.log('⚠️ Using basic fallback responses');
     const fallbackResponse = getBasicResponse(query);
-    
     return res.status(200).json({
       response: fallbackResponse,
-      source: 'basic-fallback',
+      source: 'fallback',
       model: 'cached-responses',
-      message: isRateLimited ? 'Bedrock rate limit reached. Using cached responses.' : 'Bedrock temporarily unavailable. Using cached responses.'
+      error: error.message
     });
   }
-
-  // Fallback response if nothing else works
-  const fallbackResponse = getBasicResponse(query);
-  return res.status(200).json({
-    response: fallbackResponse,
-    source: 'emergency-fallback',
-    model: 'basic-responses'
-  });
 }
