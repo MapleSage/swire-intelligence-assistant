@@ -74,9 +74,30 @@ const SwireChatInterface: React.FC = () => {
       let response;
       let data;
       
-      // Try FastAPI backend first
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-      if (backendUrl) {
+      // Try Bedrock Agent with Knowledge Base first (PRIMARY)
+      try {
+        response = await fetch("/api/bedrock-agent", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
+          },
+          body: JSON.stringify({ 
+            query: textToSend,
+            model: selectedModel
+          }),
+        });
+        
+        if (response.ok) {
+          data = await response.json();
+        } else {
+          throw new Error(`Bedrock Agent failed: ${response.status}`);
+        }
+      } catch (bedrockError) {
+        console.log('Bedrock Agent failed, trying FastAPI fallback:', bedrockError);
+        
+        // Fallback to FastAPI backend
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
         try {
           response = await fetch(`${backendUrl}/chat`, {
             method: "POST",
@@ -90,41 +111,12 @@ const SwireChatInterface: React.FC = () => {
           if (response.ok) {
             data = await response.json();
           } else {
-            throw new Error(`Backend failed: ${response.status}`);
+            throw new Error(`FastAPI backend also failed: ${response.status}`);
           }
-        } catch (backendError) {
-          console.log('Backend failed, trying Azure OpenAI fallback:', backendError);
-          
-          // Fallback to Azure OpenAI via API route
-          response = await fetch("/api/bedrock-agent", {
-            method: "POST",
-            headers: { 
-              "Content-Type": "application/json",
-              ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
-            },
-            body: JSON.stringify({ 
-              query: textToSend,
-              model: selectedModel
-            }),
-          });
-          
-          data = await response.json();
+        } catch (fastApiError) {
+          console.log('FastAPI also failed:', fastApiError);
+          throw new Error('Both Bedrock Agent and FastAPI failed');
         }
-      } else {
-        // No backend URL, use API route directly
-        response = await fetch("/api/bedrock-agent", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
-          },
-          body: JSON.stringify({ 
-            query: textToSend,
-            model: selectedModel
-          }),
-        });
-        
-        data = await response.json();
       }
 
       const assistantMessage: Message = {

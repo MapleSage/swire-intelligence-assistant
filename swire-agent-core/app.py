@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from src.core.agent_core import AgentCore
+from src.agents.multi_agent_orchestrator import MultiAgentOrchestrator
 
 app = FastAPI(title="Swire Intelligence Assistant")
 
@@ -13,7 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-agent = AgentCore()
+orchestrator = MultiAgentOrchestrator()
 
 class ChatRequest(BaseModel):
     query: str
@@ -24,8 +24,8 @@ class ChatResponse(BaseModel):
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
-        response = await agent.run_query(request.query)
-        return ChatResponse(response=response)
+        result = await orchestrator.orchestrate_query(request.query)
+        return ChatResponse(response=result["response"])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

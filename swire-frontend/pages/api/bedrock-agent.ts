@@ -320,9 +320,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
+    const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand } = require('@aws-sdk/client-bedrock-agent-runtime');
     
-    const client = new BedrockRuntimeClient({
+    const client = new BedrockAgentRuntimeClient({
       region: process.env.AWS_REGION || 'us-east-1',
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
@@ -330,24 +330,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    const command = new InvokeModelCommand({
-      modelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
-      body: JSON.stringify({
-        messages: [{ role: 'user', content: query }],
-        max_tokens: 2000,
-        anthropic_version: 'bedrock-2023-05-31'
-      }),
-      contentType: 'application/json',
-      accept: 'application/json',
+    const command = new RetrieveAndGenerateCommand({
+      input: {
+        text: query,
+      },
+      retrieveAndGenerateConfiguration: {
+        type: 'KNOWLEDGE_BASE',
+        knowledgeBaseConfiguration: {
+          knowledgeBaseId: process.env.BEDROCK_KNOWLEDGE_BASE_ID || 'BELWMDUYUJ',
+          modelArn: `arn:aws:bedrock:${process.env.AWS_REGION || 'us-east-1'}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0`,
+        },
+      },
     });
 
     const response = await client.send(command);
-    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
 
     return res.status(200).json({
-      response: responseBody.content[0].text,
-      source: 'bedrock-runtime',
-      model: 'claude-3.5-sonnet-v2'
+      response: response.output?.text || 'No response generated',
+      source: 'bedrock-kb',
+      model: 'claude-3-sonnet-kb',
+      citations: response.citations || []
     });
 
   } catch (error: any) {

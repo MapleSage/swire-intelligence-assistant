@@ -14,7 +14,7 @@ s3 = session.client('s3')
 bedrock_agent = session.client('bedrock-agent')
 
 BUCKET_NAME = "swire-agent-kb-bucket"
-KB_ID = "IXQZQVQHQR"
+KB_ID = "BELWMDUYUJ"
 
 def upload_ceo_data():
     """Upload CEO data to S3 knowledge base"""
