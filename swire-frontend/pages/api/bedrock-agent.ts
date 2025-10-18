@@ -344,9 +344,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const response = await client.send(command);
+    const responseText = response.output?.text || 'No response generated';
+    
+    // Check if Claude refused to answer - throw error to trigger FastAPI fallback
+    if (responseText.includes('unable to assist') || responseText.includes('cannot help')) {
+      throw new Error('Claude content filter triggered');
+    }
 
     return res.status(200).json({
-      response: response.output?.text || 'No response generated',
+      response: responseText,
       source: 'bedrock-kb',
       model: 'claude-3-sonnet-kb',
       citations: response.citations || []

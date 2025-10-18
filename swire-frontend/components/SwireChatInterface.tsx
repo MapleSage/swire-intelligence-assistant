@@ -115,17 +115,12 @@ const SwireChatInterface: React.FC = () => {
           }
         } catch (fastApiError) {
           console.log('FastAPI also failed, using fallback response');
-          // Use basic fallback response
-          data = { response: getBasicFallback(textToSend) };
+          const q = textToSend.toLowerCase();
+          const fallbackResponse = q.includes('ceo') || q.includes('ryan') 
+            ? 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy.'
+            : 'I am SageGreen, your Swire Renewable Energy assistant. How can I help you?';
+          data = { response: fallbackResponse };
         }
-      }
-      
-      function getBasicFallback(query: string): string {
-        const q = query.toLowerCase();
-        if (q.includes('ceo') || q.includes('ryan')) {
-          return 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy.';
-        }
-        return 'I am SageGreen, your Swire Renewable Energy assistant. How can I help you?';
       }
 
       const assistantMessage: Message = {
