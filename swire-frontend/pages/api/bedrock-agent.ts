@@ -171,11 +171,11 @@ const getBedrockClient = () => {
 let lastBedrockCall = 0;
 const MIN_BEDROCK_INTERVAL = 1000; // 1 second between calls
 
-// Azure OpenAI Fallback
+// Azure AI Foundry Agent Fallback
 const queryAzureOpenAI = async (query: string) => {
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT || process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT;
+  const endpoint = 'https://swirere-3699-resource.openai.azure.com';
   const apiKey = process.env.AZURE_OPENAI_KEY;
-  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o';
+  const deployment = 'swire-gpt-4o';
   
   if (!endpoint || !apiKey) {
     throw new Error('Azure OpenAI not configured');
@@ -320,53 +320,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand } = require('@aws-sdk/client-bedrock-agent-runtime');
+    const result = await queryBedrockAgent(query);
     
-    const client = new BedrockAgentRuntimeClient({
-      region: process.env.AWS_REGION || 'us-east-1',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-      },
-    });
-
-    const command = new RetrieveAndGenerateCommand({
-      input: {
-        text: query,
-      },
-      retrieveAndGenerateConfiguration: {
-        type: 'KNOWLEDGE_BASE',
-        knowledgeBaseConfiguration: {
-          knowledgeBaseId: process.env.BEDROCK_KNOWLEDGE_BASE_ID || 'BELWMDUYUJ',
-          modelArn: `arn:aws:bedrock:${process.env.AWS_REGION || 'us-east-1'}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0`,
-        },
-      },
-    });
-
-    const response = await client.send(command);
-    const responseText = response.output?.text || 'No response generated';
-    
-    // Check if Claude refused to answer - throw error to trigger FastAPI fallback
-    if (responseText.includes('unable to assist') || responseText.includes('cannot help')) {
-      throw new Error('Claude content filter triggered');
-    }
-
     return res.status(200).json({
-      response: responseText,
-      source: 'bedrock-kb',
-      model: 'claude-3-sonnet-kb',
-      citations: response.citations || []
+      response: result.text,
+      source: 'bedrock-agent',
+      model: 'claude-3.5-sonnet',
+      sessionId: result.sessionId
     });
 
   } catch (error: any) {
-    console.error('Bedrock error:', error);
+    console.error('Bedrock Agent error:', error);
     
-    const fallbackResponse = getBasicResponse(query);
-    return res.status(200).json({
-      response: fallbackResponse,
-      source: 'fallback',
-      model: 'cached-responses',
-      error: error.message
-    });
+    try {
+      const azureResponse = await queryAzureOpenAI(query);
+      return res.status(200).json({
+        response: azureResponse,
+        source: 'azure-gpt4o',
+        model: 'swire-gpt-4o'
+      });
+    } catch (azureError) {
+      console.error('Azure GPT-4o failed:', azureError);
+      const fallbackResponse = getBasicResponse(query);
+      return res.status(200).json({
+        response: fallbackResponse,
+        source: 'cached-fallback',
+        model: 'cached-responses'
+      });
+    }
   }
 }
