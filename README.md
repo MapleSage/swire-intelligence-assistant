@@ -1,6 +1,6 @@
-# Swire Intelligence Assistant
+# SageGreen AI Assistant
 
-Enterprise AI assistant with multi-agent orchestration and Azure-powered RAG pipeline.
+Enterprise ESG and Renewable Energy AI assistant with multi-agent orchestration and Azure-powered RAG pipeline.
 
 ## 🏗️ Architecture
 
@@ -88,11 +88,11 @@ Location: swire-agent-core/data/vector_index
 **File**: `swire-agent-core/src/agents/swire_specialist_agent.py`
 
 **Domains**:
-1. **Wind Energy**: Turbine maintenance, performance metrics
-2. **Solar Energy**: Panel cleaning, inverter monitoring
-3. **Operations**: Shift patterns, emergency procedures
-4. **Safety**: PPE requirements, incident reporting
-5. **Finance**: Budget categories, KPI metrics
+1. **Wind Energy**: Turbine maintenance, performance metrics, renewable projects
+2. **Solar Energy**: Panel cleaning, inverter monitoring, solar installations
+3. **ESG Compliance**: Environmental impact, sustainability metrics, carbon footprint
+4. **Safety**: PPE requirements, incident reporting, regulatory compliance
+5. **Finance**: Budget categories, KPI metrics, ESG investments
 
 ## 🔧 Backend Components
 
@@ -327,7 +327,7 @@ python app.py
 
 ## 📄 License
 
-Proprietary - Swire Renewable Energy
+Proprietary - SageGreen AI
 
 ---
 
