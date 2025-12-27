@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, LogOut, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor, Copy, Volume2, ThumbsUp, ThumbsDown, RotateCcw, Plus } from "lucide-react";
+import { Send, User, Bot, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor, Copy, Volume2, ThumbsUp, ThumbsDown, RotateCcw, Plus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useAuth } from "../lib/auth-context";
 import DocumentUpload from "./DocumentUpload";
 import ModelSelector from "./ModelSelector";
 
@@ -13,25 +12,11 @@ interface Message {
 }
 
 const SwireChatInterface: React.FC = () => {
-  const { session, logout } = useAuth();
-  const [user, setUser] = useState<any>(null);
-  
-  useEffect(() => {
-    // Get user info from Amplify session
-    if (session?.tokens?.idToken) {
-      const idToken = session.tokens.idToken;
-      setUser({
-        email: idToken.payload.email,
-        name: idToken.payload.name || idToken.payload.email,
-        sub: idToken.payload.sub
-      });
-    }
-  }, [session]);
 
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm Swire Intelligence Assistant. I'm here to help you with any questions about Swire Renewable Energy's finance, operations, safety, and HR matters. How can I assist you today?",
+      content: "Hello! I'm SageGreen AI Assistant. I'm here to help you with ESG compliance, renewable energy, sustainability metrics, and environmental insights. How can I assist you today?",
       sender: "assistant",
       timestamp: new Date(),
     },
@@ -68,46 +53,41 @@ const SwireChatInterface: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Get access token from Amplify session
-      const accessToken = session?.tokens?.accessToken?.toString();
-      
       let response;
       let data;
-      
-      // Try Bedrock Agent with Knowledge Base first (PRIMARY)
+
+      // Try Azure OpenAI + Cognitive Search first (PRIMARY)
       try {
-        response = await fetch("/api/bedrock-agent", {
+        response = await fetch("/api/azure-kb-chat", {
           method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
+          headers: {
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             query: textToSend,
             model: selectedModel
           }),
         });
-        
+
         if (response.ok) {
           data = await response.json();
         } else {
-          throw new Error(`Bedrock Agent failed: ${response.status}`);
+          throw new Error(`Azure AI failed: ${response.status}`);
         }
-      } catch (bedrockError) {
-        console.log('Bedrock failed, trying FastAPI fallback:', bedrockError);
-        
-        // Fallback to FastAPI backend
-        const backendUrl = 'http://localhost:8000';
+      } catch (azureError) {
+        console.log('Azure AI failed, trying FastAPI fallback:', azureError);
+
+        // Fallback to FastAPI backend (Azure Container Instance)
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://20.72.179.10';
         try {
           response = await fetch(`${backendUrl}/chat`, {
             method: "POST",
-            headers: { 
-              "Content-Type": "application/json",
-              ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
+            headers: {
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({ query: textToSend }),
           });
-          
+
           if (response.ok) {
             data = await response.json();
           } else {
@@ -116,9 +96,9 @@ const SwireChatInterface: React.FC = () => {
         } catch (fastApiError) {
           console.log('FastAPI also failed, using fallback response');
           const q = textToSend.toLowerCase();
-          const fallbackResponse = q.includes('ceo') || q.includes('ryan') 
-            ? 'Ryan Smith serves as Chief Executive Officer of Swire Renewable Energy.'
-            : 'I am SageGreen, your Swire Renewable Energy assistant. How can I help you?';
+          const fallbackResponse = q.includes('esg') || q.includes('sustainability')
+            ? 'SageGreen helps organizations track ESG compliance, sustainability metrics, and renewable energy performance.'
+            : 'I am SageGreen AI, your ESG and Renewable Energy assistant. How can I help you?';
           data = { response: fallbackResponse };
         }
       }
@@ -165,17 +145,12 @@ const SwireChatInterface: React.FC = () => {
         try {
           const formData = new FormData();
           formData.append("audio", blob, "recording.wav");
-          
-          const accessToken = session?.tokens?.accessToken?.toString();
-          
+
           const response = await fetch("/api/speech-to-text", {
             method: "POST",
-            headers: {
-              ...(accessToken && { "Authorization": `Bearer ${accessToken}` })
-            },
             body: formData,
           });
-          
+
           const data = await response.json();
           if (data.text) {
             setInputMessage(data.text);
@@ -322,28 +297,18 @@ const SwireChatInterface: React.FC = () => {
         </div>
 
         <div className="mt-auto p-6 border-t border-slate-700">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-                <User className="w-4 h-4 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm text-slate-300 font-medium truncate max-w-[150px]">
-                  {user?.name || user?.email || 'User'}
-                </span>
-                {user?.email && user?.name !== user?.email && (
-                  <span className="text-xs text-slate-500 truncate max-w-[150px]">
-                    {user.email}
-                  </span>
-                )}
-              </div>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+              <User className="w-4 h-4 text-white" />
             </div>
-            <button
-              onClick={logout}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200"
-              title="Sign Out">
-              <LogOut className="w-4 h-4" />
-            </button>
+            <div className="flex flex-col">
+              <span className="text-sm text-slate-300 font-medium">
+                SageGreen User
+              </span>
+              <span className="text-xs text-slate-500">
+                ESG & Renewable Energy
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -351,17 +316,11 @@ const SwireChatInterface: React.FC = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
-        <div className="lg:hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-3 flex items-center justify-between">
+        <div className="lg:hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-3 flex items-center justify-center">
           <div className="flex items-center space-x-2">
             <img src="/sageigreen_logo_ wht.png" alt="SageGreen" className="w-6 h-6 rounded" />
             <h1 className="font-bold text-white text-sm">SageGreen AI</h1>
           </div>
-          <button
-            onClick={logout}
-            className="p-1 text-white/80 hover:text-white rounded"
-            title="Sign Out">
-            <LogOut className="w-4 h-4" />
-          </button>
         </div>
         
         {/* Desktop Header */}
