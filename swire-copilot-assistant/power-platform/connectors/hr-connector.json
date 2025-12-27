@@ -1,0 +1,1049 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Swire HR Data Connector",
+        "description": "Custom connector for accessing Swire Renewables Human Resources data including workforce metrics, attendance, performance, and training analytics via Microsoft Graph API",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Swire HR Team",
+            "email": "hr-support@swire.com"
+        }
+    },
+    "host": "graph.microsoft.com",
+    "basePath": "/v1.0",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "oauth2": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+            "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+            "scopes": {
+                "https://graph.microsoft.com/User.Read.All": "Read all users",
+                "https://graph.microsoft.com/Directory.Read.All": "Read directory data",
+                "https://graph.microsoft.com/Reports.Read.All": "Read usage reports"
+            }
+        }
+    },
+    "security": [
+        {
+            "oauth2": [
+                "https://graph.microsoft.com/User.Read.All",
+                "https://graph.microsoft.com/Directory.Read.All",
+                "https://graph.microsoft.com/Reports.Read.All"
+            ]
+        }
+    ],
+    "paths": {
+        "/swire/hr/workforce": {
+            "get": {
+                "summary": "Get Workforce Analytics",
+                "description": "Retrieve comprehensive workforce metrics and analytics",
+                "operationId": "GetWorkforceAnalytics",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Time period for workforce data",
+                        "enum": [
+                            "current_month",
+                            "current_quarter",
+                            "ytd",
+                            "rolling_12_months"
+                        ],
+                        "default": "current_month"
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter"
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Location filter"
+                    },
+                    {
+                        "name": "include_contractors",
+                        "in": "query",
+                        "type": "boolean",
+                        "required": false,
+                        "description": "Include contractor data",
+                        "default": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Workforce analytics retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/WorkforceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized - invalid or missing authentication"
+                    },
+                    "403": {
+                        "description": "Forbidden - insufficient permissions"
+                    }
+                }
+            }
+        },
+        "/swire/hr/attendance": {
+            "get": {
+                "summary": "Get Attendance Data",
+                "description": "Retrieve attendance rates and time analytics",
+                "operationId": "GetAttendanceData",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Attendance period",
+                        "enum": [
+                            "current_month",
+                            "last_month",
+                            "current_quarter",
+                            "ytd"
+                        ],
+                        "default": "current_month"
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter"
+                    },
+                    {
+                        "name": "include_overtime",
+                        "in": "query",
+                        "type": "boolean",
+                        "required": false,
+                        "description": "Include overtime data",
+                        "default": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Attendance data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/AttendanceResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swire/hr/productivity": {
+            "get": {
+                "summary": "Get Productivity Metrics",
+                "description": "Retrieve employee productivity and performance metrics",
+                "operationId": "GetProductivityMetrics",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Productivity period",
+                        "enum": [
+                            "current_month",
+                            "current_quarter",
+                            "ytd"
+                        ],
+                        "default": "current_quarter"
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter"
+                    },
+                    {
+                        "name": "metric_type",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Productivity metric type",
+                        "enum": [
+                            "efficiency",
+                            "quality",
+                            "goals_achievement",
+                            "collaboration"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Productivity metrics retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/ProductivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swire/hr/training": {
+            "get": {
+                "summary": "Get Training Analytics",
+                "description": "Retrieve training completion and development metrics",
+                "operationId": "GetTrainingAnalytics",
+                "parameters": [
+                    {
+                        "name": "training_category",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Training category filter",
+                        "enum": [
+                            "technical_skills",
+                            "safety_training",
+                            "leadership_development",
+                            "compliance_training",
+                            "soft_skills"
+                        ]
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter"
+                    },
+                    {
+                        "name": "completion_status",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Training completion status",
+                        "enum": [
+                            "completed",
+                            "in_progress",
+                            "overdue",
+                            "not_started"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Training analytics retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/TrainingResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swire/hr/performance": {
+            "get": {
+                "summary": "Get Performance Analytics",
+                "description": "Retrieve employee performance ratings and review data",
+                "operationId": "GetPerformanceAnalytics",
+                "parameters": [
+                    {
+                        "name": "review_period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Performance review period",
+                        "enum": [
+                            "current_quarter",
+                            "last_quarter",
+                            "current_year",
+                            "last_year"
+                        ],
+                        "default": "current_quarter"
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter"
+                    },
+                    {
+                        "name": "performance_level",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Performance level filter",
+                        "enum": [
+                            "excellent",
+                            "good",
+                            "satisfactory",
+                            "needs_improvement"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Performance analytics retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/PerformanceResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swire/hr/diversity": {
+            "get": {
+                "summary": "Get Diversity & Inclusion Metrics",
+                "description": "Retrieve diversity and inclusion analytics (anonymized)",
+                "operationId": "GetDiversityMetrics",
+                "parameters": [
+                    {
+                        "name": "metric_type",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Diversity metric type",
+                        "enum": [
+                            "gender_distribution",
+                            "age_distribution",
+                            "tenure_distribution",
+                            "leadership_diversity"
+                        ]
+                    },
+                    {
+                        "name": "organizational_level",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Organizational level filter",
+                        "enum": [
+                            "all_employees",
+                            "management",
+                            "senior_leadership",
+                            "individual_contributors"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Diversity metrics retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/DiversityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swire/hr/summary": {
+            "post": {
+                "summary": "Get HR Summary",
+                "description": "Generate comprehensive HR summary based on query parameters",
+                "operationId": "GetHRSummary",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/HRQueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HR summary generated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/HRSummaryResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "WorkforceResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "total_employees": {
+                    "type": "integer"
+                },
+                "active_employees": {
+                    "type": "integer"
+                },
+                "contractors": {
+                    "type": "integer"
+                },
+                "headcount_change": {
+                    "type": "integer"
+                },
+                "headcount_change_percent": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "new_hires": {
+                    "type": "integer"
+                },
+                "departures": {
+                    "type": "integer"
+                },
+                "turnover_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "workforce_by_department": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DepartmentWorkforce"
+                    }
+                },
+                "workforce_by_location": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/LocationWorkforce"
+                    }
+                }
+            }
+        },
+        "AttendanceResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "overall_attendance_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "total_man_hours": {
+                    "type": "integer"
+                },
+                "avg_hours_per_employee": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "overtime_hours": {
+                    "type": "integer"
+                },
+                "absence_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "attendance_by_department": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DepartmentAttendance"
+                    }
+                },
+                "top_performing_teams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TeamPerformance"
+                    }
+                }
+            }
+        },
+        "ProductivityResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "overall_productivity_score": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "productivity_trend": {
+                    "type": "string",
+                    "enum": [
+                        "improving",
+                        "stable",
+                        "declining"
+                    ]
+                },
+                "goals_achievement_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "productivity_by_function": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FunctionProductivity"
+                    }
+                },
+                "productivity_kpis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ProductivityKPI"
+                    }
+                },
+                "improvement_opportunities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ImprovementOpportunity"
+                    }
+                }
+            }
+        },
+        "TrainingResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "overall_completion_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "active_training_programs": {
+                    "type": "integer"
+                },
+                "employees_in_training": {
+                    "type": "integer"
+                },
+                "training_hours_completed": {
+                    "type": "integer"
+                },
+                "compliance_training_status": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "training_by_category": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TrainingCategory"
+                    }
+                },
+                "upcoming_requirements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UpcomingTraining"
+                    }
+                },
+                "training_effectiveness": {
+                    "$ref": "#/definitions/TrainingEffectiveness"
+                }
+            }
+        },
+        "PerformanceResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "review_period": {
+                    "type": "string"
+                },
+                "reviews_completed": {
+                    "type": "integer"
+                },
+                "reviews_pending": {
+                    "type": "integer"
+                },
+                "average_rating": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "performance_distribution": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PerformanceDistribution"
+                    }
+                },
+                "top_performers": {
+                    "type": "integer"
+                },
+                "improvement_plans": {
+                    "type": "integer"
+                },
+                "promotion_readiness": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PromotionReadiness"
+                    }
+                }
+            }
+        },
+        "DiversityResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "gender_distribution": {
+                    "$ref": "#/definitions/GenderDistribution"
+                },
+                "age_distribution": {
+                    "$ref": "#/definitions/AgeDistribution"
+                },
+                "tenure_distribution": {
+                    "$ref": "#/definitions/TenureDistribution"
+                },
+                "leadership_diversity": {
+                    "$ref": "#/definitions/LeadershipDiversity"
+                },
+                "diversity_trends": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DiversityTrend"
+                    }
+                }
+            }
+        },
+        "HRQueryRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Natural language HR query"
+                },
+                "timeframe": {
+                    "type": "string",
+                    "description": "Time period for the query"
+                },
+                "department": {
+                    "type": "string",
+                    "description": "Department filter"
+                },
+                "metric": {
+                    "type": "string",
+                    "description": "Specific HR metric requested"
+                },
+                "userId": {
+                    "type": "string",
+                    "description": "User ID for audit logging"
+                }
+            },
+            "required": [
+                "query",
+                "userId"
+            ]
+        },
+        "HRSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "department": {
+                    "type": "string"
+                },
+                "total_employees": {
+                    "type": "integer"
+                },
+                "total_man_hours": {
+                    "type": "integer"
+                },
+                "attendance_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "productivity_score": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "training_completion": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "department_breakdown": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DepartmentSummary"
+                    }
+                },
+                "insights": {
+                    "type": "string",
+                    "description": "AI-generated HR insights"
+                },
+                "recommendations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "DepartmentWorkforce": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "headcount": {
+                    "type": "integer"
+                },
+                "capacity_utilization": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "growth_rate": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "LocationWorkforce": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string"
+                },
+                "headcount": {
+                    "type": "integer"
+                },
+                "percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "DepartmentAttendance": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "attendance_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "man_hours": {
+                    "type": "integer"
+                },
+                "utilization": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "TeamPerformance": {
+            "type": "object",
+            "properties": {
+                "team_name": {
+                    "type": "string"
+                },
+                "attendance_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "productivity_score": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "FunctionProductivity": {
+            "type": "object",
+            "properties": {
+                "function": {
+                    "type": "string"
+                },
+                "productivity_score": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "efficiency": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "quality": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "ProductivityKPI": {
+            "type": "object",
+            "properties": {
+                "kpi_name": {
+                    "type": "string"
+                },
+                "current_value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "target": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "trend": {
+                    "type": "string",
+                    "enum": [
+                        "up",
+                        "down",
+                        "stable"
+                    ]
+                },
+                "variance_percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "ImprovementOpportunity": {
+            "type": "object",
+            "properties": {
+                "area": {
+                    "type": "string"
+                },
+                "recommendation": {
+                    "type": "string"
+                },
+                "potential_impact": {
+                    "type": "string",
+                    "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                    ]
+                }
+            }
+        },
+        "TrainingCategory": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "completion_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "enrolled": {
+                    "type": "integer"
+                },
+                "completed": {
+                    "type": "integer"
+                }
+            }
+        },
+        "UpcomingTraining": {
+            "type": "object",
+            "properties": {
+                "training_name": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "assigned_count": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "string",
+                    "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                    ]
+                }
+            }
+        },
+        "TrainingEffectiveness": {
+            "type": "object",
+            "properties": {
+                "satisfaction_score": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "knowledge_retention": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "application_rate": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "PerformanceDistribution": {
+            "type": "object",
+            "properties": {
+                "rating": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "PromotionReadiness": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "string"
+                },
+                "ready_count": {
+                    "type": "integer"
+                },
+                "development_needed": {
+                    "type": "integer"
+                }
+            }
+        },
+        "GenderDistribution": {
+            "type": "object",
+            "properties": {
+                "male_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "female_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "other_percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "AgeDistribution": {
+            "type": "object",
+            "properties": {
+                "under_30": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "30_to_40": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "40_to_50": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "over_50": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "TenureDistribution": {
+            "type": "object",
+            "properties": {
+                "less_than_1_year": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "1_to_3_years": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "3_to_5_years": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "more_than_5_years": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "LeadershipDiversity": {
+            "type": "object",
+            "properties": {
+                "senior_leadership_diversity": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "middle_management_diversity": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "diversity_pipeline": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "DiversityTrend": {
+            "type": "object",
+            "properties": {
+                "metric": {
+                    "type": "string"
+                },
+                "current_value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "previous_value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "trend": {
+                    "type": "string",
+                    "enum": [
+                        "improving",
+                        "stable",
+                        "declining"
+                    ]
+                }
+            }
+        },
+        "DepartmentSummary": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "headcount": {
+                    "type": "integer"
+                },
+                "utilization": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        }
+    },
+    "x-ms-connector-metadata": [
+        {
+            "propertyName": "Website",
+            "propertyValue": "https://swire.com"
+        },
+        {
+            "propertyName": "Privacy policy",
+            "propertyValue": "https://swire.com/privacy"
+        },
+        {
+            "propertyName": "Categories",
+            "propertyValue": "Human Resources;Analytics;Data"
+        }
+    ]
+}

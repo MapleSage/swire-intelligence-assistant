@@ -1,0 +1,112 @@
+# Greeting Topic for Swire Intelligence Assistant
+# Handles initial user interactions and provides guidance
+
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnUnknownIntent
+  actions:
+    - kind: SendActivity
+      activity: |
+        Hello! 👋 I'm the **Swire Intelligence Assistant**.
+
+        I can help you access and analyze enterprise data across:
+
+        🏢 **Finance** - Revenue, expenses, budgets, KPIs
+        🛡️ **HSE** - Safety incidents, compliance reports, trends  
+        👥 **HR** - Workforce metrics, attendance, productivity
+        📄 **Documents** - Company policies, procedures, reports
+
+        What would you like to explore today?
+
+    - kind: SuggestedActions
+      actions:
+        - title: "📊 Financial Summary"
+          type: imBack
+          value: "Show me this month's financial performance"
+
+        - title: "🛡️ Safety Overview"
+          type: imBack
+          value: "What's our current safety status?"
+
+        - title: "👥 Workforce Analytics"
+          type: imBack
+          value: "Get workforce metrics for this quarter"
+
+        - title: "🔍 Search Documents"
+          type: imBack
+          value: "Search company policies"
+
+        - title: "📈 Cross-Domain Insights"
+          type: imBack
+          value: "Show me operational insights combining all data sources"
+
+triggers:
+  - kind: OnIntent
+    intent: Greeting
+    actions:
+      - kind: SendActivity
+        activity: |
+          Welcome back to the Swire Intelligence Assistant! 
+
+          I'm here to help you access enterprise data and insights. What can I assist you with today?
+
+  - kind: OnIntent
+    intent: Help
+    actions:
+      - kind: SendActivity
+        activity: |
+          I can help you with various enterprise data queries:
+
+          **Finance Queries:**
+          • "Show revenue for this quarter"
+          • "What's our budget variance?"
+          • "Compare expenses year over year"
+
+          **HSE Queries:**
+          • "Recent safety incidents"
+          • "HSE compliance status"
+          • "Safety trend analysis"
+
+          **HR Queries:**
+          • "Workforce utilization by department"
+          • "Attendance rates this month"
+          • "Employee productivity metrics"
+
+          **Document Search:**
+          • "Find safety procedures"
+          • "Search HR policies"
+          • "Locate maintenance manuals"
+
+          **Cross-Domain Analysis:**
+          • "Correlate incidents with workforce data"
+          • "Compare safety performance across sites"
+          • "Generate executive dashboard summary"
+
+          Just ask me in natural language - I'll understand and help you find the information you need!
+
+entities:
+  - name: Department
+    type: list
+    values:
+      - Finance
+      - HSE
+      - HR
+      - Operations
+      - IT
+      - Legal
+      - Procurement
+
+  - name: TimeFrame
+    type: prebuilt
+    prebuiltType: datetimeV2
+
+  - name: MetricType
+    type: list
+    values:
+      - Revenue
+      - Expenses
+      - Budget
+      - Incidents
+      - Attendance
+      - Productivity
+      - Compliance

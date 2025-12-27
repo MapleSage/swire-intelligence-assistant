@@ -1,0 +1,721 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Swire Finance Data Connector",
+        "description": "Custom connector for accessing Swire Renewables financial data including revenue, expenses, budgets, and KPIs",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Swire IT Support",
+            "email": "it-support@swire.com"
+        }
+    },
+    "host": "api.swire-finance.internal",
+    "basePath": "/v1",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "oauth2": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+            "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+            "scopes": {
+                "https://api.swire-finance.internal/.default": "Access Swire Finance API"
+            }
+        }
+    },
+    "security": [
+        {
+            "oauth2": [
+                "https://api.swire-finance.internal/.default"
+            ]
+        }
+    ],
+    "paths": {
+        "/revenue": {
+            "get": {
+                "summary": "Get Revenue Data",
+                "description": "Retrieve revenue information for specified time period and department",
+                "operationId": "GetRevenue",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Time period (current_month, last_month, current_quarter, last_quarter, ytd)",
+                        "enum": [
+                            "current_month",
+                            "last_month",
+                            "current_quarter",
+                            "last_quarter",
+                            "ytd"
+                        ],
+                        "default": "current_month"
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter (optional)"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Currency code (EUR, USD, GBP)",
+                        "enum": [
+                            "EUR",
+                            "USD",
+                            "GBP"
+                        ],
+                        "default": "EUR"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Revenue data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/RevenueResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized - invalid or missing authentication"
+                    },
+                    "403": {
+                        "description": "Forbidden - insufficient permissions"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/expenses": {
+            "get": {
+                "summary": "Get Expense Data",
+                "description": "Retrieve expense information by category and time period",
+                "operationId": "GetExpenses",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Time period for expense data",
+                        "enum": [
+                            "current_month",
+                            "last_month",
+                            "current_quarter",
+                            "last_quarter",
+                            "ytd"
+                        ],
+                        "default": "current_month"
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Expense category filter"
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Expense data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/ExpenseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/budget": {
+            "get": {
+                "summary": "Get Budget Information",
+                "description": "Retrieve budget data and variance analysis",
+                "operationId": "GetBudget",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Budget period",
+                        "enum": [
+                            "current_month",
+                            "current_quarter",
+                            "current_year"
+                        ],
+                        "default": "current_month"
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Department filter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Budget data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/BudgetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/kpis": {
+            "get": {
+                "summary": "Get Financial KPIs",
+                "description": "Retrieve key performance indicators and financial metrics",
+                "operationId": "GetKPIs",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "KPI period",
+                        "enum": [
+                            "current_month",
+                            "current_quarter",
+                            "ytd"
+                        ],
+                        "default": "current_month"
+                    },
+                    {
+                        "name": "metrics",
+                        "in": "query",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "required": false,
+                        "description": "Specific metrics to retrieve"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "KPI data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/KPIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/cashflow": {
+            "get": {
+                "summary": "Get Cash Flow Data",
+                "description": "Retrieve cash flow information and projections",
+                "operationId": "GetCashFlow",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Cash flow period",
+                        "enum": [
+                            "current_month",
+                            "current_quarter",
+                            "next_quarter",
+                            "ytd"
+                        ],
+                        "default": "current_month"
+                    },
+                    {
+                        "name": "include_projections",
+                        "in": "query",
+                        "type": "boolean",
+                        "required": false,
+                        "description": "Include future projections",
+                        "default": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cash flow data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/CashFlowResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/financial-summary": {
+            "post": {
+                "summary": "Get Financial Summary",
+                "description": "Generate comprehensive financial summary based on query parameters",
+                "operationId": "GetFinancialSummary",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FinancialQueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Financial summary generated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/FinancialSummaryResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "RevenueResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "total_revenue": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "previous_period": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "growth_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "revenue_by_source": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RevenueSource"
+                    }
+                },
+                "revenue_by_department": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DepartmentRevenue"
+                    }
+                }
+            }
+        },
+        "ExpenseResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "total_expenses": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "budget_allocated": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "variance_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "expenses_by_category": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ExpenseCategory"
+                    }
+                },
+                "top_expenses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ExpenseItem"
+                    }
+                }
+            }
+        },
+        "BudgetResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "total_budget": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "utilized_amount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "utilization_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "remaining_budget": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "on_track",
+                        "warning",
+                        "over_budget"
+                    ]
+                },
+                "department_budgets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DepartmentBudget"
+                    }
+                }
+            }
+        },
+        "KPIResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "kpis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/KPIMetric"
+                    }
+                }
+            }
+        },
+        "CashFlowResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "opening_balance": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "closing_balance": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "net_cash_flow": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "cash_inflows": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "cash_outflows": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "projections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CashFlowProjection"
+                    }
+                }
+            }
+        },
+        "FinancialQueryRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Natural language financial query"
+                },
+                "timeframe": {
+                    "type": "string",
+                    "description": "Time period for the query"
+                },
+                "department": {
+                    "type": "string",
+                    "description": "Department filter"
+                },
+                "userId": {
+                    "type": "string",
+                    "description": "User ID for audit logging"
+                }
+            },
+            "required": [
+                "query",
+                "userId"
+            ]
+        },
+        "FinancialSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "revenue": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "expenses": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "net_income": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "budget_variance": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "kpis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/KPIMetric"
+                    }
+                },
+                "insights": {
+                    "type": "string",
+                    "description": "AI-generated insights and recommendations"
+                },
+                "charts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ChartData"
+                    }
+                }
+            }
+        },
+        "RevenueSource": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "DepartmentRevenue": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "revenue": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "growth": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "ExpenseCategory": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "budget_variance": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "ExpenseItem": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "department": {
+                    "type": "string"
+                }
+            }
+        },
+        "DepartmentBudget": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "allocated_budget": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "utilized_amount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "utilization_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "on_track",
+                        "warning",
+                        "over_budget"
+                    ]
+                }
+            }
+        },
+        "KPIMetric": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "target": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "trend": {
+                    "type": "string",
+                    "enum": [
+                        "up",
+                        "down",
+                        "stable"
+                    ]
+                },
+                "variance_percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "CashFlowProjection": {
+            "type": "object",
+            "properties": {
+                "period": {
+                    "type": "string"
+                },
+                "projected_inflow": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "projected_outflow": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "projected_balance": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "ChartData": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "bar",
+                        "line",
+                        "pie",
+                        "area"
+                    ]
+                },
+                "title": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "x-ms-connector-metadata": [
+        {
+            "propertyName": "Website",
+            "propertyValue": "https://swire.com"
+        },
+        {
+            "propertyName": "Privacy policy",
+            "propertyValue": "https://swire.com/privacy"
+        },
+        {
+            "propertyName": "Categories",
+            "propertyValue": "Finance;Data"
+        }
+    ]
+}

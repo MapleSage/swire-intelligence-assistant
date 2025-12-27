@@ -1,0 +1,115 @@
+{
+    "name": "Swire Intelligence Assistant",
+    "description": "Enterprise AI assistant for Swire Renewables providing access to finance, HSE, and HR data through natural language conversations",
+    "version": "1.0.0",
+    "language": "en-US",
+    "schemaVersion": "1.0",
+    "configuration": {
+        "greeting": {
+            "enabled": true,
+            "message": "Hello! I'm the Swire Intelligence Assistant. I can help you access enterprise data, analyze reports, and provide insights across Finance, HSE, and HR systems. What would you like to know?",
+            "suggestedActions": [
+                "Show me this month's financial summary",
+                "What are the recent HSE incidents?",
+                "Get workforce metrics for this quarter",
+                "Search company policies",
+                "Help me understand our safety performance"
+            ]
+        },
+        "fallback": {
+            "enabled": true,
+            "message": "I didn't quite understand that. I can help you with:\n\n• Financial data and reports\n• HSE incidents and safety metrics\n• HR and workforce analytics\n• Company document search\n• Cross-domain business insights\n\nCould you please rephrase your question or try one of these topics?",
+            "escalation": {
+                "enabled": true,
+                "threshold": 3,
+                "message": "It seems I'm having trouble understanding your request. Would you like me to connect you with a human support agent?",
+                "transferToAgent": true
+            }
+        },
+        "conversationFlow": {
+            "contextRetention": true,
+            "maxTurns": 50,
+            "sessionTimeout": 30,
+            "enableMultiTurn": true
+        },
+        "security": {
+            "authenticationRequired": true,
+            "authProvider": "AzureAD",
+            "roleBasedAccess": true,
+            "auditLogging": true,
+            "dataClassification": "Internal"
+        },
+        "compliance": {
+            "euDataResidency": true,
+            "gdprCompliant": true,
+            "dataRetentionDays": 90,
+            "encryptionAtRest": true,
+            "encryptionInTransit": true
+        }
+    },
+    "channels": [
+        {
+            "name": "Microsoft Teams",
+            "enabled": true,
+            "configuration": {
+                "adaptiveCards": true,
+                "proactiveMessaging": true,
+                "fileUpload": true,
+                "voiceInput": true
+            }
+        },
+        {
+            "name": "Power BI",
+            "enabled": true,
+            "configuration": {
+                "embeddedChat": true,
+                "contextAware": true,
+                "reportIntegration": true
+            }
+        },
+        {
+            "name": "Web Chat",
+            "enabled": false,
+            "configuration": {
+                "publicAccess": false,
+                "authenticationRequired": true
+            }
+        }
+    ],
+    "integrations": {
+        "azureOpenAI": {
+            "enabled": true,
+            "endpoint": "https://swire-copilot-dev-openai.openai.azure.com/",
+            "deployment": "gpt-4",
+            "apiVersion": "2023-12-01-preview",
+            "maxTokens": 4000,
+            "temperature": 0.3,
+            "systemPrompt": "You are the Swire Intelligence Assistant, an enterprise AI helper for Swire Renewables. You provide accurate, helpful information about company data, policies, and operations. Always maintain a professional tone and ensure data privacy and security. When you don't have specific information, clearly state this and suggest alternative approaches."
+        },
+        "cognitiveSearch": {
+            "enabled": true,
+            "endpoint": "https://swire-copilot-dev-search.search.windows.net",
+            "indexName": "swire-knowledge-base",
+            "apiVersion": "2023-11-01",
+            "searchMode": "hybrid",
+            "semanticConfiguration": "swire-semantic-config",
+            "topK": 5
+        },
+        "powerPlatform": {
+            "enabled": true,
+            "environmentUrl": "https://your-environment.crm.dynamics.com/",
+            "connectors": [
+                "finance-connector",
+                "hse-connector",
+                "hr-connector"
+            ]
+        }
+    },
+    "analytics": {
+        "enabled": true,
+        "trackConversations": true,
+        "trackUserSatisfaction": true,
+        "trackPerformanceMetrics": true,
+        "retentionPeriod": 365
+    }
+}

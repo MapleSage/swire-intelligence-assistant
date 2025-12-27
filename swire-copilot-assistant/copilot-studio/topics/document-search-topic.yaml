@@ -1,0 +1,248 @@
+# Document Search Topic for Swire Intelligence Assistant
+# Handles knowledge base searches and document retrieval
+
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnIntent
+  intent: DocumentSearch
+  actions:
+    - kind: SetProperty
+      property: conversation.topic
+      value: "DocumentSearch"
+
+    - kind: TextInput
+      property: user.searchQuery
+      prompt: |
+        I can help you search through company documents and knowledge base. What are you looking for?
+
+        Examples:
+        • "Find safety procedures for offshore operations"
+        • "Search HR policies about remote work"
+        • "Locate maintenance manuals for wind turbines"
+        • "Find financial reporting guidelines"
+        • "Search environmental compliance documents"
+
+      validations:
+        - kind: Expression
+          expression: "length(this.value) > 2"
+          errorMessage: "Please provide at least 3 characters for the search."
+
+    - kind: HttpRequest
+      method: POST
+      url: "${settings.CognitiveSearch.Endpoint}/indexes/${settings.CognitiveSearch.IndexName}/docs/search"
+      headers:
+        Authorization: "Bearer ${settings.CognitiveSearch.AccessToken}"
+        Content-Type: "application/json"
+        api-key: "${settings.CognitiveSearch.ApiKey}"
+      body:
+        search: "${user.searchQuery}"
+        searchMode: "all"
+        queryType: "semantic"
+        semanticConfiguration: "swire-semantic-config"
+        top: 5
+        select: "id,title,content,source,department,documentType,lastModified,tags"
+        highlight: "content"
+        filter: "${if(entities.Department, `department eq '${entities.Department}'`, '')}"
+      resultProperty: "conversation.searchResults"
+
+    - kind: IfCondition
+      condition: "conversation.searchResults.value && count(conversation.searchResults.value) > 0"
+      actions:
+        - kind: SendActivity
+          activity: |
+            ## 🔍 Search Results for "${user.searchQuery}"
+
+            Found **${count(conversation.searchResults.value)}** relevant documents:
+
+            ${foreach(conversation.searchResults.value, result,
+              `### 📄 ${result.title}\n**Source:** ${result.source} | **Department:** ${result.department}\n**Type:** ${result.documentType} | **Last Modified:** ${formatDate(result.lastModified)}\n\n**Summary:** ${substring(result.content, 0, 200)}...\n\n${if(result['@search.highlights'], `**Key Excerpts:**\n${join(result['@search.highlights'].content, '\n...\n')}\n`, '')}\n**Tags:** ${join(result.tags, ', ')}\n\n---\n`
+            )}
+
+        - kind: SuggestedActions
+          actions:
+            - title: "🔍 Refine Search"
+              type: imBack
+              value: "Search for more specific information"
+
+            - title: "📂 Browse by Category"
+              type: imBack
+              value: "Show document categories"
+
+            - title: "📊 Related Documents"
+              type: imBack
+              value: "Find related documents"
+
+            - title: "💾 Save Results"
+              type: imBack
+              value: "Save these search results"
+
+      elseActions:
+        - kind: SendActivity
+          activity: |
+            ## 🔍 No Results Found
+
+            I couldn't find any documents matching "${user.searchQuery}".
+
+            **Suggestions:**
+            • Try different keywords or phrases
+            • Use broader search terms
+            • Check spelling and try synonyms
+            • Browse by document category or department
+
+            **Available Document Categories:**
+            📋 Policies & Procedures
+            🛡️ Safety & HSE Documents  
+            👥 HR Guidelines & Forms
+            💰 Financial Procedures
+            🔧 Technical Manuals
+            🌍 Environmental Reports
+            📊 Operational Guidelines
+
+        - kind: SuggestedActions
+          actions:
+            - title: "📂 Browse Categories"
+              type: imBack
+              value: "Show all document categories"
+
+            - title: "🔍 New Search"
+              type: imBack
+              value: "Try a different search"
+
+            - title: "📞 Contact Support"
+              type: imBack
+              value: "Contact document management team"
+
+triggers:
+  - kind: OnIntent
+    intent: BrowseDocuments
+    actions:
+      - kind: SendActivity
+        activity: |
+          ## 📂 Document Categories
+
+          Browse documents by category:
+
+          🛡️ **Safety & HSE**
+          • Safety procedures and protocols
+          • Incident reporting guidelines
+          • Environmental compliance documents
+          • Emergency response plans
+
+          👥 **Human Resources**
+          • Employee policies and procedures
+          • Training materials and guides
+          • Performance management documents
+          • Benefits and compensation info
+
+          💰 **Finance & Accounting**
+          • Financial reporting procedures
+          • Budget planning guidelines
+          • Expense management policies
+          • Audit and compliance documents
+
+          🔧 **Operations & Technical**
+          • Equipment manuals and specifications
+          • Maintenance procedures
+          • Quality assurance guidelines
+          • Technical standards and protocols
+
+          📊 **Corporate & Governance**
+          • Corporate policies and procedures
+          • Governance frameworks
+          • Legal and regulatory documents
+          • Strategic planning materials
+
+      - kind: SuggestedActions
+        actions:
+          - title: "🛡️ Safety & HSE"
+            type: imBack
+            value: "Show safety and HSE documents"
+
+          - title: "👥 HR Documents"
+            type: imBack
+            value: "Show HR policies and procedures"
+
+          - title: "💰 Finance Docs"
+            type: imBack
+            value: "Show financial procedures"
+
+          - title: "🔧 Technical Manuals"
+            type: imBack
+            value: "Show technical documentation"
+
+  - kind: OnIntent
+    intent: RecentDocuments
+    actions:
+      - kind: HttpRequest
+        method: POST
+        url: "${settings.CognitiveSearch.Endpoint}/indexes/${settings.CognitiveSearch.IndexName}/docs/search"
+        headers:
+          Authorization: "Bearer ${settings.CognitiveSearch.AccessToken}"
+          Content-Type: "application/json"
+          api-key: "${settings.CognitiveSearch.ApiKey}"
+        body:
+          search: "*"
+          top: 10
+          select: "title,source,department,documentType,lastModified"
+          orderby: "lastModified desc"
+        resultProperty: "conversation.recentDocs"
+
+      - kind: SendActivity
+        activity: |
+          ## 📅 Recently Updated Documents
+
+          ${foreach(conversation.recentDocs.value, doc,
+            `📄 **${doc.title}**\n📂 ${doc.department} | 📋 ${doc.documentType}\n📅 Updated: ${formatDate(doc.lastModified)}\n`
+          )}
+
+  - kind: OnIntent
+    intent: PopularDocuments
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.DocumentAnalyticsUrl}/popular"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.popularDocs"
+
+      - kind: SendActivity
+        activity: |
+          ## 📈 Most Accessed Documents
+
+          ${foreach(conversation.popularDocs.documents, doc,
+            `📄 **${doc.title}**\n👀 Views: ${doc.viewCount} | 📂 ${doc.department}\n📋 ${doc.documentType} | ⭐ Rating: ${doc.rating}/5\n`
+          )}
+
+entities:
+  - name: DocumentType
+    type: list
+    values:
+      - Policy
+      - Procedure
+      - Manual
+      - Report
+      - Form
+      - Template
+      - Guideline
+      - Standard
+
+  - name: DocumentCategory
+    type: list
+    values:
+      - "Safety & HSE"
+      - "Human Resources"
+      - "Finance & Accounting"
+      - "Operations"
+      - "Technical"
+      - "Legal & Compliance"
+      - "Corporate Governance"
+      - "Quality Assurance"
+
+  - name: SearchScope
+    type: list
+    values:
+      - "All Documents"
+      - "Recent Updates"
+      - "Popular Documents"
+      - "My Department"
+      - "Bookmarked Items"

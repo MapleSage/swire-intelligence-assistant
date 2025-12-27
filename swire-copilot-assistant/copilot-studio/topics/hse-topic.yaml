@@ -1,0 +1,228 @@
+# HSE (Health, Safety, Environment) Topic for Swire Intelligence Assistant
+# Handles safety incidents, compliance reports, and HSE analytics
+
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnIntent
+  intent: HSEQuery
+  actions:
+    - kind: SetProperty
+      property: conversation.topic
+      value: "HSE"
+
+    - kind: TextInput
+      property: user.hseQuery
+      prompt: |
+        I can help you with Health, Safety & Environment information. What would you like to know?
+
+        Examples:
+        • Recent safety incidents and their status
+        • HSE compliance metrics and trends
+        • Safety performance by location or department
+        • Environmental impact assessments
+        • Incident investigation reports
+
+      validations:
+        - kind: Expression
+          expression: "length(this.value) > 3"
+          errorMessage: "Please provide more details about the HSE information you need."
+
+    - kind: HttpRequest
+      method: POST
+      url: "${settings.PowerPlatform.HSEConnectorUrl}"
+      headers:
+        Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        Content-Type: "application/json"
+      body:
+        query: "${user.hseQuery}"
+        timeframe: "${entities.TimeFrame}"
+        location: "${entities.Location}"
+        severity: "${entities.Severity}"
+        userId: "${user.id}"
+      resultProperty: "conversation.hseData"
+
+    - kind: IfCondition
+      condition: "conversation.hseData.success == true"
+      actions:
+        - kind: SendActivity
+          activity: |
+            ## 🛡️ HSE Summary
+
+            **Period:** ${conversation.hseData.period}
+            **Location:** ${conversation.hseData.location || 'All Sites'}
+
+            ### Safety Metrics
+            🚨 **Total Incidents:** ${conversation.hseData.totalIncidents}
+            ⚠️ **High Severity:** ${conversation.hseData.highSeverityIncidents}
+            📊 **Incident Rate:** ${conversation.hseData.incidentRate} per 100,000 hours
+            🎯 **Days Since Last Incident:** ${conversation.hseData.daysSinceLastIncident}
+
+            ### Compliance Status
+            ✅ **Compliance Score:** ${conversation.hseData.complianceScore}%
+            📋 **Audits Completed:** ${conversation.hseData.auditsCompleted}
+            ⏰ **Overdue Actions:** ${conversation.hseData.overdueActions}
+
+            ### Recent Incidents
+            ${foreach(conversation.hseData.recentIncidents, incident,
+              `**${incident.date}** - ${incident.type} (${incident.severity})\n📍 ${incident.location}\n📝 ${incident.description}\n🔄 Status: ${incident.status}\n`
+            )}
+
+            ${if(conversation.hseData.trends, 
+              `### 📈 Trends & Insights\n${conversation.hseData.trends}`, 
+              ''
+            )}
+
+        - kind: SuggestedActions
+          actions:
+            - title: "📊 View Trends"
+              type: imBack
+              value: "Show HSE trends for the last 6 months"
+
+            - title: "🔍 Incident Details"
+              type: imBack
+              value: "Show detailed incident analysis"
+
+            - title: "📍 By Location"
+              type: imBack
+              value: "Compare safety performance by site"
+
+            - title: "📋 Compliance Report"
+              type: imBack
+              value: "Generate HSE compliance report"
+
+      elseActions:
+        - kind: SendActivity
+          activity: |
+            I'm unable to retrieve HSE data at the moment. This might be due to:
+
+            • System maintenance or temporary unavailability
+            • Access restrictions for the requested information
+            • Network connectivity issues
+
+            Please try again shortly or contact the HSE team for urgent matters.
+
+            **Error Details:** ${conversation.hseData.error}
+
+triggers:
+  - kind: OnIntent
+    intent: HSEIncidents
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.HSEConnectorUrl}/incidents"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.incidentData"
+
+      - kind: SendActivity
+        activity: |
+          ## 🚨 Recent Safety Incidents
+
+          **Total Incidents (Last 30 days):** ${conversation.incidentData.total}
+          **Open Investigations:** ${conversation.incidentData.openInvestigations}
+          **Average Resolution Time:** ${conversation.incidentData.avgResolutionTime} days
+
+          ### Incidents by Severity
+          ${foreach(conversation.incidentData.bySeverity, severity,
+            `${if(severity.level == 'Critical', '🔴', if(severity.level == 'High', '🟠', if(severity.level == 'Medium', '🟡', '🟢')))} **${severity.level}:** ${severity.count} incidents`
+          )}
+
+          ### Recent Incidents
+          ${foreach(conversation.incidentData.recent, incident,
+            `**${formatDate(incident.date)}** - ${incident.type}\n📍 ${incident.location} | 👤 ${incident.reportedBy}\n📝 ${incident.shortDescription}\n🔄 ${incident.status}\n`
+          )}
+
+  - kind: OnIntent
+    intent: HSECompliance
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.HSEConnectorUrl}/compliance"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.complianceData"
+
+      - kind: SendActivity
+        activity: |
+          ## 📋 HSE Compliance Status
+
+          **Overall Compliance Score:** ${conversation.complianceData.overallScore}%
+          **Last Audit Date:** ${formatDate(conversation.complianceData.lastAuditDate)}
+          **Next Audit Due:** ${formatDate(conversation.complianceData.nextAuditDue)}
+
+          ### Compliance by Category
+          ${foreach(conversation.complianceData.categories, category,
+            `${if(category.score >= 90, '✅', if(category.score >= 75, '⚠️', '❌'))} **${category.name}:** ${category.score}%`
+          )}
+
+          ### Action Items
+          ${foreach(conversation.complianceData.actionItems, action,
+            `${if(action.priority == 'High', '🔴', if(action.priority == 'Medium', '🟡', '🟢'))} **${action.title}**\n📅 Due: ${formatDate(action.dueDate)}\n👤 Assigned: ${action.assignee}\n`
+          )}
+
+  - kind: OnIntent
+    intent: HSETrends
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.HSEConnectorUrl}/trends"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.trendData"
+
+      - kind: SendActivity
+        activity: |
+          ## 📈 HSE Performance Trends
+
+          **Trend Period:** ${conversation.trendData.period}
+          **Overall Trend:** ${conversation.trendData.overallTrend} ${if(conversation.trendData.improving, '📈 Improving', '📉 Needs Attention')}
+
+          ### Key Metrics Trends
+          ${foreach(conversation.trendData.metrics, metric,
+            `**${metric.name}:** ${metric.currentValue} ${if(metric.trend == 'up', '📈', if(metric.trend == 'down', '📉', '➡️'))} (${metric.changePercentage}% vs previous period)`
+          )}
+
+          ### Insights & Recommendations
+          ${foreach(conversation.trendData.insights, insight,
+            `💡 ${insight.description}\n📊 Impact: ${insight.impact}\n🎯 Recommendation: ${insight.recommendation}\n`
+          )}
+
+entities:
+  - name: IncidentType
+    type: list
+    values:
+      - "Near Miss"
+      - "First Aid"
+      - "Medical Treatment"
+      - "Lost Time Injury"
+      - "Environmental Incident"
+      - "Property Damage"
+      - "Security Incident"
+
+  - name: Severity
+    type: list
+    values:
+      - Critical
+      - High
+      - Medium
+      - Low
+
+  - name: Location
+    type: list
+    values:
+      - "All Sites"
+      - "Offshore Wind Farm A"
+      - "Offshore Wind Farm B"
+      - "Onshore Operations"
+      - "Maintenance Facility"
+      - "Head Office"
+
+  - name: ComplianceArea
+    type: list
+    values:
+      - "Safety Management"
+      - "Environmental Protection"
+      - "Occupational Health"
+      - "Emergency Preparedness"
+      - "Training & Competency"
+      - "Risk Assessment"

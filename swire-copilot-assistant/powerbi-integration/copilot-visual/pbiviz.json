@@ -1,0 +1,206 @@
+{
+    "visual": {
+        "name": "SwireCopilotChat",
+        "displayName": "Swire Copilot Chat",
+        "guid": "SwireCopilotChat_1234567890",
+        "visualClassName": "SwireCopilotVisual",
+        "version": "1.0.0",
+        "description": "Interactive chat interface for Swire Intelligence Assistant integrated with Power BI reports",
+        "supportUrl": "https://swire.com/support",
+        "gitHubUrl": "https://github.com/swire/copilot-powerbi-visual"
+    },
+    "apiVersion": "5.1.0",
+    "author": {
+        "name": "Swire Renewables IT Team",
+        "email": "it-support@swire.com"
+    },
+    "assets": {
+        "icon": "assets/icon.png"
+    },
+    "externalJS": [
+        "node_modules/powerbi-visuals-utils-dataviewutils/lib/index.js",
+        "node_modules/powerbi-visuals-utils-formattingutils/lib/index.js"
+    ],
+    "style": "style/visual.less",
+    "capabilities": {
+        "dataRoles": [
+            {
+                "displayName": "Context Data",
+                "name": "contextData",
+                "kind": "Grouping"
+            },
+            {
+                "displayName": "Metrics",
+                "name": "metrics",
+                "kind": "Measure"
+            }
+        ],
+        "dataViewMappings": [
+            {
+                "conditions": [
+                    {
+                        "contextData": {
+                            "max": 10
+                        },
+                        "metrics": {
+                            "max": 20
+                        }
+                    }
+                ],
+                "categorical": {
+                    "categories": {
+                        "for": {
+                            "in": "contextData"
+                        },
+                        "dataReductionAlgorithm": {
+                            "top": {}
+                        }
+                    },
+                    "values": {
+                        "select": [
+                            {
+                                "bind": {
+                                    "to": "metrics"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "objects": {
+            "chatSettings": {
+                "displayName": "Chat Settings",
+                "properties": {
+                    "enableChat": {
+                        "displayName": "Enable Chat",
+                        "type": {
+                            "bool": true
+                        }
+                    },
+                    "chatPosition": {
+                        "displayName": "Chat Position",
+                        "type": {
+                            "enumeration": [
+                                {
+                                    "displayName": "Bottom Right",
+                                    "value": "bottom-right"
+                                },
+                                {
+                                    "displayName": "Bottom Left",
+                                    "value": "bottom-left"
+                                },
+                                {
+                                    "displayName": "Side Panel",
+                                    "value": "side-panel"
+                                },
+                                {
+                                    "displayName": "Full Width",
+                                    "value": "full-width"
+                                }
+                            ]
+                        }
+                    },
+                    "chatHeight": {
+                        "displayName": "Chat Height (px)",
+                        "type": {
+                            "numeric": true
+                        }
+                    },
+                    "showSuggestions": {
+                        "displayName": "Show Suggestions",
+                        "type": {
+                            "bool": true
+                        }
+                    }
+                }
+            },
+            "appearance": {
+                "displayName": "Appearance",
+                "properties": {
+                    "theme": {
+                        "displayName": "Theme",
+                        "type": {
+                            "enumeration": [
+                                {
+                                    "displayName": "Light",
+                                    "value": "light"
+                                },
+                                {
+                                    "displayName": "Dark",
+                                    "value": "dark"
+                                },
+                                {
+                                    "displayName": "Auto",
+                                    "value": "auto"
+                                }
+                            ]
+                        }
+                    },
+                    "primaryColor": {
+                        "displayName": "Primary Color",
+                        "type": {
+                            "fill": {
+                                "solid": {
+                                    "color": true
+                                }
+                            }
+                        }
+                    },
+                    "fontSize": {
+                        "displayName": "Font Size",
+                        "type": {
+                            "numeric": true
+                        }
+                    }
+                }
+            },
+            "integration": {
+                "displayName": "Integration Settings",
+                "properties": {
+                    "copilotEndpoint": {
+                        "displayName": "Copilot Endpoint URL",
+                        "type": {
+                            "text": true
+                        }
+                    },
+                    "enableContextAware": {
+                        "displayName": "Context-Aware Responses",
+                        "type": {
+                            "bool": true
+                        }
+                    },
+                    "maxContextItems": {
+                        "displayName": "Max Context Items",
+                        "type": {
+                            "numeric": true
+                        }
+                    }
+                }
+            }
+        },
+        "supportsKeyboardFocus": true,
+        "supportsMultiVisualSelection": false,
+        "sorting": {
+            "default": {}
+        },
+        "drilldown": {
+            "roles": [
+                "contextData"
+            ]
+        }
+    },
+    "dependencies": {
+        "powerbi-visuals-api": "^5.1.0",
+        "powerbi-visuals-utils-dataviewutils": "^3.0.0",
+        "powerbi-visuals-utils-formattingutils": "^5.0.0",
+        "powerbi-visuals-utils-interactivityutils": "^5.8.0",
+        "powerbi-visuals-utils-tooltiputils": "^3.0.0"
+    },
+    "devDependencies": {
+        "@types/d3": "^7.4.0",
+        "d3": "^7.8.0",
+        "typescript": "^4.9.0",
+        "webpack": "^5.75.0"
+    }
+}

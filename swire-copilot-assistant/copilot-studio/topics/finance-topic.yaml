@@ -1,0 +1,198 @@
+# Finance Topic for Swire Intelligence Assistant
+# Handles financial data queries and analysis
+
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnIntent
+  intent: FinanceQuery
+  actions:
+    - kind: SetProperty
+      property: conversation.topic
+      value: "Finance"
+
+    - kind: TextInput
+      property: user.financeQuery
+      prompt: |
+        I can help you with financial information. What specific data would you like to see?
+
+        Examples:
+        • Revenue and expenses for a specific period
+        • Budget variance analysis
+        • KPI performance metrics
+        • Financial trends and comparisons
+
+      validations:
+        - kind: Expression
+          expression: "length(this.value) > 3"
+          errorMessage: "Please provide more details about what financial information you need."
+
+    - kind: HttpRequest
+      method: POST
+      url: "${settings.PowerPlatform.FinanceConnectorUrl}"
+      headers:
+        Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        Content-Type: "application/json"
+      body:
+        query: "${user.financeQuery}"
+        timeframe: "${entities.TimeFrame}"
+        department: "${entities.Department}"
+        userId: "${user.id}"
+      resultProperty: "conversation.financeData"
+
+    - kind: IfCondition
+      condition: "conversation.financeData.success == true"
+      actions:
+        - kind: SendActivity
+          activity: |
+            ## 📊 Financial Summary
+
+            **Period:** ${conversation.financeData.period}
+
+            ### Key Metrics
+            💰 **Revenue:** $${formatNumber(conversation.financeData.revenue)}
+            💸 **Expenses:** $${formatNumber(conversation.financeData.expenses)}
+            📈 **Net Income:** $${formatNumber(conversation.financeData.netIncome)}
+            📊 **Budget Variance:** ${conversation.financeData.budgetVariance}%
+
+            ### KPI Performance
+            ${foreach(conversation.financeData.kpis, kpi, 
+              `• **${kpi.name}:** ${kpi.value} (Target: ${kpi.target}) ${if(kpi.trend == 'up', '📈', if(kpi.trend == 'down', '📉', '➡️'))}`
+            )}
+
+            ${if(conversation.financeData.insights, 
+              `### 💡 Key Insights\n${conversation.financeData.insights}`, 
+              ''
+            )}
+
+        - kind: SuggestedActions
+          actions:
+            - title: "📈 View Trends"
+              type: imBack
+              value: "Show financial trends for the last 6 months"
+
+            - title: "🔍 Drill Down"
+              type: imBack
+              value: "Break down expenses by category"
+
+            - title: "📊 Compare Periods"
+              type: imBack
+              value: "Compare this quarter to last quarter"
+
+            - title: "📋 Generate Report"
+              type: imBack
+              value: "Create financial summary report"
+
+      elseActions:
+        - kind: SendActivity
+          activity: |
+            I'm having trouble accessing the financial data right now. This could be due to:
+
+            • Temporary system unavailability
+            • Insufficient permissions for the requested data
+            • Network connectivity issues
+
+            Please try again in a few moments, or contact IT support if the issue persists.
+
+            **Error Details:** ${conversation.financeData.error}
+
+triggers:
+  - kind: OnIntent
+    intent: FinanceRevenue
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.FinanceConnectorUrl}/revenue"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.revenueData"
+
+      - kind: SendActivity
+        activity: |
+          ## 💰 Revenue Analysis
+
+          **Current Period Revenue:** $${formatNumber(conversation.revenueData.current)}
+          **Previous Period:** $${formatNumber(conversation.revenueData.previous)}
+          **Growth:** ${conversation.revenueData.growthPercentage}%
+
+          ### Revenue by Source
+          ${foreach(conversation.revenueData.sources, source,
+            `• **${source.name}:** $${formatNumber(source.amount)} (${source.percentage}%)`
+          )}
+
+  - kind: OnIntent
+    intent: FinanceExpenses
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.FinanceConnectorUrl}/expenses"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.expenseData"
+
+      - kind: SendActivity
+        activity: |
+          ## 💸 Expense Analysis
+
+          **Total Expenses:** $${formatNumber(conversation.expenseData.total)}
+          **Budget Allocated:** $${formatNumber(conversation.expenseData.budget)}
+          **Variance:** ${conversation.expenseData.variance}%
+
+          ### Top Expense Categories
+          ${foreach(conversation.expenseData.categories, category,
+            `• **${category.name}:** $${formatNumber(category.amount)} (${category.percentage}% of total)`
+          )}
+
+  - kind: OnIntent
+    intent: FinanceBudget
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.FinanceConnectorUrl}/budget"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.budgetData"
+
+      - kind: SendActivity
+        activity: |
+          ## 📊 Budget Performance
+
+          **Budget Status:** ${conversation.budgetData.status}
+          **Utilization:** ${conversation.budgetData.utilizationPercentage}%
+          **Remaining:** $${formatNumber(conversation.budgetData.remaining)}
+
+          ### Department Budget Status
+          ${foreach(conversation.budgetData.departments, dept,
+            `• **${dept.name}:** ${dept.utilizationPercentage}% used ${if(dept.status == 'over', '⚠️', if(dept.status == 'warning', '⚡', '✅'))}`
+          )}
+
+entities:
+  - name: FinancialMetric
+    type: list
+    values:
+      - Revenue
+      - Expenses
+      - Profit
+      - Budget
+      - Cash Flow
+      - ROI
+      - EBITDA
+
+  - name: TimePeriod
+    type: list
+    values:
+      - "This month"
+      - "Last month"
+      - "This quarter"
+      - "Last quarter"
+      - "This year"
+      - "Last year"
+      - "YTD"
+
+  - name: ReportType
+    type: list
+    values:
+      - Summary
+      - Detailed
+      - Trend Analysis
+      - Comparison
+      - Forecast

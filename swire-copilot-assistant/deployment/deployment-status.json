@@ -1,0 +1,42 @@
+{
+    "deploymentId": "deploy-20241102-143000",
+    "environment": "dev",
+    "status": "simulated",
+    "timestamp": "2024-11-02T14:30:00Z",
+    "components": {
+        "azureInfrastructure": {
+            "status": "simulated",
+            "resourceGroup": "swire-copilot-dev-rg",
+            "location": "westeurope",
+            "resources": [
+                "Azure OpenAI Service",
+                "Azure Cognitive Search",
+                "Azure Key Vault",
+                "Storage Account",
+                "Application Insights"
+            ]
+        },
+        "copilotStudio": {
+            "status": "simulated",
+            "environmentId": "env-12345678-1234-1234-1234-123456789012",
+            "botId": "swire-intelligence-assistant-dev",
+            "topics": 6
+        },
+        "teamsIntegration": {
+            "status": "ready",
+            "appPackage": "teams-integration/swire-intelligence-assistant-dev.zip",
+            "manifestVersion": "1.16"
+        },
+        "powerbiIntegration": {
+            "status": "ready",
+            "visualPackage": "powerbi-integration/copilot-visual/dist/SwireCopilotChat.pbiviz"
+        }
+    },
+    "nextSteps": [
+        "Install PowerShell Core for actual deployment",
+        "Install Power Platform CLI",
+        "Configure actual API endpoints",
+        "Upload Teams app to Admin Center",
+        "Deploy Power BI custom visual"
+    ]
+}

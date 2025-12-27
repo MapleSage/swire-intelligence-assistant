@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swire Intelligence Assistant</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .chat-container {
+        width: 90%;
+        max-width: 800px;
+        height: 80vh;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .chat-header {
+        background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .chat-header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .chat-header p {
+        opacity: 0.9;
+        font-size: 14px;
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f8f9fa;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .message.user {
+        justify-content: flex-end;
+      }
+
+      .message.assistant {
+        justify-content: flex-start;
+      }
+
+      .message-content {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        word-wrap: break-word;
+      }
+
+      .message.user .message-content {
+        background: #0078d4;
+        color: white;
+        border-bottom-right-radius: 4px;
+      }
+
+      .message.assistant .message-content {
+        background: white;
+        color: #333;
+        border: 1px solid #e1e5e9;
+        border-bottom-left-radius: 4px;
+      }
+
+      .message-time {
+        font-size: 11px;
+        opacity: 0.7;
+        margin-top: 4px;
+      }
+
+      .suggestions {
+        padding: 0 20px 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .suggestion-btn {
+        background: #e3f2fd;
+        border: 1px solid #0078d4;
+        color: #0078d4;
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+
+      .suggestion-btn:hover {
+        background: #0078d4;
+        color: white;
+      }
+
+      .chat-input-container {
+        padding: 20px;
+        background: white;
+        border-top: 1px solid #e1e5e9;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #e1e5e9;
+        border-radius: 25px;
+        outline: none;
+        font-size: 14px;
+        resize: none;
+        max-height: 100px;
+      }
+
+      .chat-input:focus {
+        border-color: #0078d4;
+        box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+      }
+
+      .send-btn {
+        background: #0078d4;
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        transition: background 0.2s;
+      }
+
+      .send-btn:hover {
+        background: #106ebe;
+      }
+
+      .send-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 12px 16px;
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 18px;
+        border-bottom-left-radius: 4px;
+        max-width: 70%;
+      }
+
+      .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #999;
+        border-radius: 50%;
+        animation: typing 1.4s infinite ease-in-out;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typing {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+        }
+        30% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .welcome-card {
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+      }
+
+      .welcome-card h3 {
+        color: #0078d4;
+        margin-bottom: 10px;
+      }
+
+      .welcome-card ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .welcome-card li {
+        padding: 5px 0;
+        color: #666;
+      }
+
+      .welcome-card li:before {
+        content: "💡 ";
+        margin-right: 8px;
+      }
+
+      @media (max-width: 768px) {
+        .chat-container {
+          width: 95%;
+          height: 90vh;
+          border-radius: 10px;
+        }
+
+        .message-content {
+          max-width: 85%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>🤖 Swire Intelligence Assistant</h1>
+        <p>Your AI-powered enterprise data assistant</p>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="message assistant">
+          <div class="message-content">
+            <div class="welcome-card">
+              <h3>Welcome to Swire Intelligence Assistant! 👋</h3>
+              <p>I can help you access and analyze enterprise data across:</p>
+              <ul>
+                <li>
+                  <strong>Finance:</strong> Revenue, expenses, budgets, KPIs
+                </li>
+                <li>
+                  <strong>HSE:</strong> Safety incidents, compliance, trends
+                </li>
+                <li>
+                  <strong>HR:</strong> Workforce metrics, attendance,
+                  performance
+                </li>
+                <li>
+                  <strong>Documents:</strong> Company policies, procedures,
+                  reports
+                </li>
+              </ul>
+              <p style="margin-top: 15px; color: #0078d4">
+                <strong>What would you like to explore today?</strong>
+              </p>
+            </div>
+            <div class="message-time">Just now</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="suggestions" id="suggestions">
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('Show me this month\'s financial performance')">
+          📊 Financial Summary
+        </button>
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('What are the recent safety incidents?')">
+          🛡️ Safety Status
+        </button>
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('Get workforce metrics for this quarter')">
+          👥 HR Analytics
+        </button>
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('Search for safety procedures')">
+          🔍 Search Documents
+        </button>
+      </div>
+
+      <div class="chat-input-container">
+        <textarea
+          class="chat-input"
+          id="chatInput"
+          placeholder="Ask me about enterprise data, reports, or search for documents..."
+          rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+
+    <script>
+      const chatMessages = document.getElementById("chatMessages");
+      const chatInput = document.getElementById("chatInput");
+      const sendBtn = document.getElementById("sendBtn");
+      const suggestions = document.getElementById("suggestions");
+
+      // Auto-resize textarea
+      chatInput.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = Math.min(this.scrollHeight, 100) + "px";
+      });
+
+      // Send message on Enter (but allow Shift+Enter for new lines)
+      chatInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      function sendSuggestion(text) {
+        chatInput.value = text;
+        sendMessage();
+      }
+
+      async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage("user", message);
+
+        // Clear input and disable send button
+        chatInput.value = "";
+        chatInput.style.height = "auto";
+        sendBtn.disabled = true;
+
+        // Hide suggestions
+        suggestions.style.display = "none";
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        try {
+          // Simulate API call (replace with actual Copilot API)
+          const response = await callCopilotAPI(message);
+
+          // Remove typing indicator
+          removeTypingIndicator();
+
+          // Add assistant response
+          addMessage("assistant", response.content, response.actions);
+        } catch (error) {
+          removeTypingIndicator();
+          addMessage(
+            "assistant",
+            "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+            null,
+            true
+          );
+        }
+
+        // Re-enable send button
+        sendBtn.disabled = false;
+        chatInput.focus();
+      }
+
+      function addMessage(type, content, actions = null, isError = false) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${type}`;
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        let actionsHtml = "";
+        if (actions && actions.length > 0) {
+          actionsHtml = '<div style="margin-top: 10px;">';
+          actions.forEach((action) => {
+            actionsHtml += `<button class="suggestion-btn" onclick="handleAction('${action.type}', '${action.data}')" style="margin: 2px;">${action.title}</button>`;
+          });
+          actionsHtml += "</div>";
+        }
+
+        messageDiv.innerHTML = `
+                <div class="message-content" ${isError ? 'style="border-color: #ff6b6b; background: #fff5f5;"' : ""}>
+                    <div>${formatMessage(content)}</div>
+                    ${actionsHtml}
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function formatMessage(content) {
+        // Convert markdown-like formatting to HTML
+        return content
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>")
+          .replace(
+            /`(.*?)`/g,
+            '<code style="background: #f1f3f4; padding: 2px 4px; border-radius: 3px;">$1</code>'
+          )
+          .replace(/\n/g, "<br>");
+      }
+
+      function showTypingIndicator() {
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "message assistant";
+        typingDiv.id = "typingIndicator";
+        typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function removeTypingIndicator() {
+        const typingIndicator = document.getElementById("typingIndicator");
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+      }
+
+      async function callCopilotAPI(message) {
+        // Simulate API delay
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1500 + Math.random() * 1000)
+        );
+
+        // Mock responses based on message content
+        const lowerMessage = message.toLowerCase();
+
+        if (
+          lowerMessage.includes("financial") ||
+          lowerMessage.includes("revenue") ||
+          lowerMessage.includes("budget")
+        ) {
+          return {
+            content: `## 📊 Financial Summary\n\n**Period:** Current Month\n\n**Key Metrics:**\n• **Revenue:** €2.4M (+12% vs last month)\n• **Expenses:** €1.8M (-5% vs budget)\n• **Net Income:** €600K (+25% vs target)\n• **Budget Variance:** +8%\n\n**Top Insights:**\n• Strong revenue growth driven by offshore wind projects\n• Operating expenses well controlled\n• Exceeding profitability targets`,
+            actions: [
+              {
+                type: "drilldown",
+                title: "📈 View Trends",
+                data: "financial-trends",
+              },
+              {
+                type: "export",
+                title: "📋 Generate Report",
+                data: "financial-report",
+              },
+            ],
+          };
+        }
+
+        if (
+          lowerMessage.includes("safety") ||
+          lowerMessage.includes("hse") ||
+          lowerMessage.includes("incident")
+        ) {
+          return {
+            content: `## 🛡️ HSE Status Summary\n\n**Period:** Last 30 Days\n\n**Safety Metrics:**\n• **Total Incidents:** 3 (↓ 40% vs last month)\n• **High Severity:** 0 incidents\n• **Days Since Last Incident:** 12 days\n• **Compliance Score:** 94%\n\n**Recent Incidents:**\n• **Oct 28** - Minor equipment malfunction (Resolved)\n• **Oct 15** - Near miss during maintenance (Under review)\n• **Oct 8** - First aid incident (Closed)\n\n**Trend:** Safety performance improving with enhanced training programs`,
+            actions: [
+              {
+                type: "drilldown",
+                title: "📊 View Details",
+                data: "hse-details",
+              },
+              { type: "filter", title: "📍 By Location", data: "hse-location" },
+            ],
+          };
+        }
+
+        if (
+          lowerMessage.includes("workforce") ||
+          lowerMessage.includes("hr") ||
+          lowerMessage.includes("employee")
+        ) {
+          return {
+            content: `## 👥 Workforce Analytics\n\n**Period:** Current Quarter\n\n**Key Metrics:**\n• **Total Employees:** 1,247 (+3% growth)\n• **Attendance Rate:** 96.2%\n• **Productivity Score:** 87/100\n• **Training Completion:** 92%\n\n**Department Breakdown:**\n• **Operations:** 456 employees (94% utilization)\n• **Engineering:** 234 employees (98% utilization)\n• **Administration:** 123 employees (89% utilization)\n\n**Insights:** Strong workforce performance with high engagement levels`,
+            actions: [
+              {
+                type: "drilldown",
+                title: "📊 Department View",
+                data: "hr-departments",
+              },
+              { type: "export", title: "📋 HR Report", data: "hr-report" },
+            ],
+          };
+        }
+
+        if (
+          lowerMessage.includes("search") ||
+          lowerMessage.includes("document") ||
+          lowerMessage.includes("policy")
+        ) {
+          return {
+            content: `## 🔍 Document Search Results\n\nFound **5 relevant documents** for your query:\n\n**📄 Safety Procedures Manual v3.2**\n*HSE Department | Last updated: Oct 2024*\nComprehensive safety procedures for offshore operations...\n\n**📄 Emergency Response Protocol**\n*HSE Department | Last updated: Sep 2024*\nStep-by-step emergency response procedures...\n\n**📄 Equipment Safety Guidelines**\n*Operations | Last updated: Oct 2024*\nSafety guidelines for wind turbine maintenance...\n\n**Tags:** safety, procedures, offshore, emergency, maintenance`,
+            actions: [
+              { type: "navigate", title: "📂 View Document", data: "doc-view" },
+              {
+                type: "filter",
+                title: "🔍 Refine Search",
+                data: "search-refine",
+              },
+            ],
+          };
+        }
+
+        // Default response
+        return {
+          content: `I understand you're asking about "${message}". I can help you with:\n\n• **Financial data** - Revenue, expenses, budgets, KPIs\n• **HSE information** - Safety incidents, compliance, trends\n• **HR analytics** - Workforce metrics, attendance, performance\n• **Document search** - Policies, procedures, reports\n\nCould you be more specific about what information you need?`,
+          actions: [
+            { type: "suggestion", title: "💰 Finance", data: "finance" },
+            { type: "suggestion", title: "🛡️ Safety", data: "safety" },
+            { type: "suggestion", title: "👥 HR", data: "hr" },
+          ],
+        };
+      }
+
+      function handleAction(type, data) {
+        switch (type) {
+          case "drilldown":
+            addMessage("user", `Show me detailed ${data} analysis`);
+            sendMessage();
+            break;
+          case "export":
+            addMessage(
+              "assistant",
+              `📋 Generating ${data}... This would normally create and download a detailed report.`
+            );
+            break;
+          case "filter":
+            addMessage("user", `Filter by ${data}`);
+            sendMessage();
+            break;
+          case "suggestion":
+            if (data === "finance")
+              sendSuggestion("Show me financial performance");
+            else if (data === "safety")
+              sendSuggestion("What is our safety status?");
+            else if (data === "hr") sendSuggestion("Show workforce analytics");
+            break;
+          default:
+            console.log("Action:", type, data);
+        }
+      }
+
+      // Focus on input when page loads
+      window.addEventListener("load", () => {
+        chatInput.focus();
+      });
+    </script>
+  </body>
+</html>

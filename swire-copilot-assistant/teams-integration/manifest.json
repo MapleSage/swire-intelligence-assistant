@@ -1,0 +1,237 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.16",
+    "version": "1.0.0",
+    "id": "swire-intelligence-assistant",
+    "packageName": "com.swire.intelligence.assistant",
+    "developer": {
+        "name": "Swire Renewables IT Team",
+        "websiteUrl": "https://swire.com",
+        "privacyUrl": "https://swire.com/privacy",
+        "termsOfUseUrl": "https://swire.com/terms"
+    },
+    "icons": {
+        "color": "color-icon.png",
+        "outline": "outline-icon.png"
+    },
+    "name": {
+        "short": "Swire Intelligence Assistant",
+        "full": "Swire Renewables Intelligence Assistant - Enterprise AI Helper"
+    },
+    "description": {
+        "short": "AI assistant for Swire Renewables enterprise data and analytics",
+        "full": "The Swire Intelligence Assistant provides natural language access to enterprise data across Finance, HSE, and HR systems. Get insights, generate reports, and search company documents through conversational AI powered by Microsoft Copilot Studio and Azure OpenAI."
+    },
+    "accentColor": "#0078D4",
+    "bots": [
+        {
+            "botId": "swire-copilot-bot-id",
+            "scopes": [
+                "personal",
+                "team",
+                "groupchat"
+            ],
+            "supportsFiles": true,
+            "isNotificationOnly": false,
+            "supportsCalling": false,
+            "supportsVideo": false,
+            "commandLists": [
+                {
+                    "scopes": [
+                        "personal",
+                        "team",
+                        "groupchat"
+                    ],
+                    "commands": [
+                        {
+                            "title": "Financial Summary",
+                            "description": "Get current financial performance summary"
+                        },
+                        {
+                            "title": "Safety Status",
+                            "description": "Check current HSE status and recent incidents"
+                        },
+                        {
+                            "title": "Workforce Analytics",
+                            "description": "View workforce metrics and attendance data"
+                        },
+                        {
+                            "title": "Search Documents",
+                            "description": "Search company policies and procedures"
+                        },
+                        {
+                            "title": "Help",
+                            "description": "Get help and see available commands"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "composeExtensions": [
+        {
+            "botId": "swire-copilot-bot-id",
+            "commands": [
+                {
+                    "id": "searchDocuments",
+                    "type": "query",
+                    "title": "Search Documents",
+                    "description": "Search company documents and knowledge base",
+                    "initialRun": false,
+                    "fetchTask": false,
+                    "context": [
+                        "compose",
+                        "message"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "searchQuery",
+                            "title": "Search Query",
+                            "description": "Enter keywords to search documents",
+                            "inputType": "text"
+                        }
+                    ]
+                },
+                {
+                    "id": "getFinanceData",
+                    "type": "query",
+                    "title": "Finance Data",
+                    "description": "Get financial metrics and reports",
+                    "initialRun": false,
+                    "fetchTask": false,
+                    "context": [
+                        "compose",
+                        "message"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "metric",
+                            "title": "Financial Metric",
+                            "description": "Select financial metric",
+                            "inputType": "choiceSet",
+                            "choices": [
+                                {
+                                    "title": "Revenue",
+                                    "value": "revenue"
+                                },
+                                {
+                                    "title": "Expenses",
+                                    "value": "expenses"
+                                },
+                                {
+                                    "title": "Budget Variance",
+                                    "value": "budget"
+                                },
+                                {
+                                    "title": "KPIs",
+                                    "value": "kpis"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ],
+    "validDomains": [
+        "swire.com",
+        "*.swire.com",
+        "*.azurewebsites.net",
+        "*.powerplatform.com"
+    ],
+    "webApplicationInfo": {
+        "id": "swire-copilot-app-id",
+        "resource": "https://api.swire.com"
+    },
+    "authorization": {
+        "permissions": {
+            "resourceSpecific": [
+                {
+                    "name": "ChannelMessage.Read.Group",
+                    "type": "Application"
+                },
+                {
+                    "name": "Channel.Create.Group",
+                    "type": "Application"
+                },
+                {
+                    "name": "TeamsActivity.Send.Group",
+                    "type": "Application"
+                }
+            ]
+        }
+    },
+    "activities": {
+        "activityTypes": [
+            {
+                "type": "taskCreated",
+                "description": "Task created from conversation",
+                "templateText": "New task created: {taskTitle}"
+            },
+            {
+                "type": "reportGenerated",
+                "description": "Report generated and shared",
+                "templateText": "Report generated: {reportTitle}"
+            },
+            {
+                "type": "alertTriggered",
+                "description": "Alert notification triggered",
+                "templateText": "Alert: {alertMessage}"
+            }
+        ]
+    },
+    "defaultInstallScope": "team",
+    "defaultGroupCapability": {
+        "team": "bot",
+        "groupchat": "bot"
+    },
+    "configurableTabs": [
+        {
+            "configurationUrl": "https://swire-copilot-config.azurewebsites.net/configure",
+            "canUpdateConfiguration": true,
+            "scopes": [
+                "team",
+                "groupchat"
+            ],
+            "context": [
+                "channelTab",
+                "privateChatTab",
+                "meetingChatTab",
+                "meetingDetailsTab"
+            ]
+        }
+    ],
+    "staticTabs": [
+        {
+            "entityId": "dashboard",
+            "name": "Dashboard",
+            "contentUrl": "https://swire-copilot-dashboard.azurewebsites.net/dashboard",
+            "websiteUrl": "https://swire-copilot-dashboard.azurewebsites.net/dashboard",
+            "scopes": [
+                "personal"
+            ]
+        },
+        {
+            "entityId": "help",
+            "name": "Help & Support",
+            "contentUrl": "https://swire-copilot-help.azurewebsites.net/help",
+            "websiteUrl": "https://swire-copilot-help.azurewebsites.net/help",
+            "scopes": [
+                "personal"
+            ]
+        }
+    ],
+    "localizationInfo": {
+        "defaultLanguageTag": "en-us",
+        "additionalLanguages": [
+            {
+                "languageTag": "en-gb",
+                "file": "en-gb.json"
+            }
+        ]
+    }
+}

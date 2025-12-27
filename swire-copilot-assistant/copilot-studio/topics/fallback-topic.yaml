@@ -1,0 +1,223 @@
+# Fallback Topic for Swire Intelligence Assistant
+# Handles unrecognized intents and provides helpful guidance
+
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnUnknownIntent
+  actions:
+    - kind: SetProperty
+      property: conversation.fallbackCount
+      value: "${if(conversation.fallbackCount, add(conversation.fallbackCount, 1), 1)}"
+
+    - kind: IfCondition
+      condition: "conversation.fallbackCount <= 2"
+      actions:
+        - kind: SendActivity
+          activity: |
+            I didn't quite understand that. Let me help you find what you're looking for! 🤔
+
+            I can assist you with:
+
+            💰 **Finance & Budget**
+            • "Show me this month's revenue"
+            • "What's our budget variance?"
+            • "Compare quarterly expenses"
+
+            🛡️ **Health, Safety & Environment**
+            • "Recent safety incidents"
+            • "HSE compliance status"
+            • "Show safety trends"
+
+            👥 **Human Resources**
+            • "Workforce metrics this quarter"
+            • "Department attendance rates"
+            • "Employee productivity data"
+
+            📄 **Document Search**
+            • "Find safety procedures"
+            • "Search HR policies"
+            • "Locate technical manuals"
+
+            📊 **Cross-Domain Analysis**
+            • "Compare performance across departments"
+            • "Generate executive summary"
+            • "Show operational insights"
+
+            Could you try rephrasing your question using one of these examples?
+
+        - kind: SuggestedActions
+          actions:
+            - title: "💰 Finance Data"
+              type: imBack
+              value: "Show me financial performance"
+
+            - title: "🛡️ Safety Status"
+              type: imBack
+              value: "What's our current safety status?"
+
+            - title: "👥 HR Metrics"
+              type: imBack
+              value: "Show workforce analytics"
+
+            - title: "🔍 Search Documents"
+              type: imBack
+              value: "Search company documents"
+
+            - title: "❓ Get Help"
+              type: imBack
+              value: "Show me what you can do"
+
+      elseActions:
+        - kind: SendActivity
+          activity: |
+            I'm having trouble understanding your requests. Let me connect you with additional support options:
+
+            🤖 **What I Can Help With:**
+            • Financial data and reporting
+            • Safety incidents and HSE metrics
+            • HR analytics and workforce data
+            • Company document search
+            • Cross-functional business insights
+
+            👨‍💼 **Need Human Help?**
+            I can connect you with the appropriate team:
+            • IT Support for technical issues
+            • HR team for employee-related questions
+            • Finance team for detailed financial analysis
+            • HSE team for safety and compliance matters
+
+            📞 **Contact Options:**
+            • Email: support@swire.com
+            • Phone: +44 (0) 20 1234 5678
+            • Teams: @SwireSupport
+
+            Would you like me to help you contact one of these teams?
+
+        - kind: SuggestedActions
+          actions:
+            - title: "🔄 Start Over"
+              type: imBack
+              value: "Hello"
+
+            - title: "📞 Contact IT Support"
+              type: imBack
+              value: "Connect me with IT support"
+
+            - title: "👥 Contact HR"
+              type: imBack
+              value: "Connect me with HR team"
+
+            - title: "💰 Contact Finance"
+              type: imBack
+              value: "Connect me with Finance team"
+
+triggers:
+  - kind: OnIntent
+    intent: Escalate
+    actions:
+      - kind: SendActivity
+        activity: |
+          I'll help you connect with the right support team. Which area do you need assistance with?
+
+          🔧 **Technical Support**
+          For system issues, access problems, or technical difficulties
+
+          👥 **HR Support**
+          For employee-related questions, policies, or HR processes
+
+          💰 **Finance Support**
+          For detailed financial analysis, budget questions, or accounting matters
+
+          🛡️ **HSE Support**
+          For safety incidents, compliance questions, or environmental matters
+
+          📋 **General Support**
+          For other questions or if you're not sure which team to contact
+
+      - kind: SuggestedActions
+        actions:
+          - title: "🔧 Technical Support"
+            type: openUrl
+            value: "mailto:it-support@swire.com?subject=Technical Support Request"
+
+          - title: "👥 HR Support"
+            type: openUrl
+            value: "mailto:hr-support@swire.com?subject=HR Support Request"
+
+          - title: "💰 Finance Support"
+            type: openUrl
+            value: "mailto:finance-support@swire.com?subject=Finance Support Request"
+
+          - title: "🛡️ HSE Support"
+            type: openUrl
+            value: "mailto:hse-support@swire.com?subject=HSE Support Request"
+
+  - kind: OnIntent
+    intent: Feedback
+    actions:
+      - kind: TextInput
+        property: user.feedback
+        prompt: |
+          I'd love to hear your feedback! Please share your thoughts about:
+          • How well I understood your requests
+          • The quality and relevance of my responses
+          • Suggestions for improvement
+          • Any features you'd like to see added
+
+        validations:
+          - kind: Expression
+            expression: "length(this.value) > 5"
+            errorMessage: "Please provide some feedback (at least a few words)."
+
+      - kind: HttpRequest
+        method: POST
+        url: "${settings.PowerPlatform.FeedbackUrl}"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+          Content-Type: "application/json"
+        body:
+          userId: "${user.id}"
+          feedback: "${user.feedback}"
+          conversationId: "${conversation.id}"
+          timestamp: "${utcNow()}"
+          rating: "${entities.Rating}"
+        resultProperty: "conversation.feedbackResult"
+
+      - kind: SendActivity
+        activity: |
+          Thank you for your feedback! 🙏
+
+          Your input helps us improve the Swire Intelligence Assistant. Our team will review your suggestions and work on making the experience even better.
+
+          **Feedback Reference:** ${conversation.feedbackResult.referenceId}
+
+          Is there anything else I can help you with today?
+
+entities:
+  - name: SupportType
+    type: list
+    values:
+      - Technical
+      - HR
+      - Finance
+      - HSE
+      - General
+
+  - name: Rating
+    type: list
+    values:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+
+  - name: IssueCategory
+    type: list
+    values:
+      - "Understanding Questions"
+      - "Data Access"
+      - "Response Quality"
+      - "System Performance"
+      - "Feature Request"
+      - "Bug Report"

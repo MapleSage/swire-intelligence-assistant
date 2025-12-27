@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment": {
+            "value": "dev"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "resourcePrefix": {
+            "value": "swire-copilot"
+        },
+        "openAIModelName": {
+            "value": "gpt-4"
+        },
+        "tags": {
+            "value": {
+                "Environment": "dev",
+                "Project": "Swire-Intelligence-Assistant",
+                "Compliance": "EU-Data-Residency",
+                "Owner": "Swire-IT",
+                "CostCenter": "IT-Operations",
+                "DataClassification": "Internal"
+            }
+        }
+    }
+}

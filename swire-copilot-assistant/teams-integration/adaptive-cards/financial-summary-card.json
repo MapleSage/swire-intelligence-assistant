@@ -1,0 +1,197 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.5",
+    "body": [
+        {
+            "type": "Container",
+            "style": "emphasis",
+            "items": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "url": "https://swire-assets.blob.core.windows.net/icons/finance-icon.png",
+                                    "size": "Small",
+                                    "style": "Person"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "📊 Financial Summary",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "Accent"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${period}",
+                                    "size": "Small",
+                                    "color": "Default",
+                                    "isSubtle": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "FactSet",
+                    "facts": [
+                        {
+                            "title": "💰 Revenue:",
+                            "value": "€${formatNumber(revenue)}"
+                        },
+                        {
+                            "title": "💸 Expenses:",
+                            "value": "€${formatNumber(expenses)}"
+                        },
+                        {
+                            "title": "📈 Net Income:",
+                            "value": "€${formatNumber(netIncome)}"
+                        },
+                        {
+                            "title": "📊 Budget Variance:",
+                            "value": "${budgetVariance}%"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "### 🎯 Key Performance Indicators",
+                    "weight": "Bolder",
+                    "size": "Medium",
+                    "spacing": "Medium"
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "ColumnSet",
+                            "columns": [
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "${kpi1.name}",
+                                            "weight": "Bolder"
+                                        },
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "${kpi1.value} (Target: ${kpi1.target})",
+                                            "size": "Small"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Column",
+                                    "width": "auto",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "${if(kpi1.trend == 'up', '📈', if(kpi1.trend == 'down', '📉', '➡️'))}",
+                                            "size": "Large"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "Graph",
+                    "someProperty": "Revenue Trend",
+                    "fallback": {
+                        "type": "TextBlock",
+                        "text": "📊 **Revenue Trend:** ${revenueTrend}% vs previous period"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "### 💡 Key Insights",
+                    "weight": "Bolder",
+                    "size": "Medium",
+                    "spacing": "Medium"
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "${insights}",
+                    "wrap": true,
+                    "size": "Small"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.Submit",
+            "title": "📈 View Detailed Trends",
+            "data": {
+                "action": "viewTrends",
+                "type": "finance",
+                "period": "${period}"
+            }
+        },
+        {
+            "type": "Action.Submit",
+            "title": "🔍 Drill Down by Department",
+            "data": {
+                "action": "drillDown",
+                "type": "finance",
+                "breakdown": "department"
+            }
+        },
+        {
+            "type": "Action.Submit",
+            "title": "📋 Generate Report",
+            "data": {
+                "action": "generateReport",
+                "type": "finance",
+                "format": "pdf"
+            }
+        },
+        {
+            "type": "Action.OpenUrl",
+            "title": "📊 Open in Power BI",
+            "url": "https://app.powerbi.com/groups/swire-finance/reports/financial-dashboard"
+        }
+    ],
+    "selectAction": {
+        "type": "Action.Submit",
+        "data": {
+            "action": "cardSelected",
+            "type": "financialSummary"
+        }
+    }
+}

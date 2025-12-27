@@ -1,0 +1,271 @@
+# HR Topic for Swire Intelligence Assistant
+# Handles workforce metrics, attendance, and HR analytics
+
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnIntent
+  intent: HRQuery
+  actions:
+    - kind: SetProperty
+      property: conversation.topic
+      value: "HR"
+
+    - kind: TextInput
+      property: user.hrQuery
+      prompt: |
+        I can help you with Human Resources information. What would you like to know?
+
+        Examples:
+        • Workforce metrics and headcount analysis
+        • Attendance rates and productivity data
+        • Employee utilization by department
+        • Training completion and compliance
+        • Performance metrics and KPIs
+
+      validations:
+        - kind: Expression
+          expression: "length(this.value) > 3"
+          errorMessage: "Please provide more details about the HR information you need."
+
+    - kind: HttpRequest
+      method: POST
+      url: "${settings.PowerPlatform.HRConnectorUrl}"
+      headers:
+        Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        Content-Type: "application/json"
+      body:
+        query: "${user.hrQuery}"
+        timeframe: "${entities.TimeFrame}"
+        department: "${entities.Department}"
+        metric: "${entities.HRMetric}"
+        userId: "${user.id}"
+      resultProperty: "conversation.hrData"
+
+    - kind: IfCondition
+      condition: "conversation.hrData.success == true"
+      actions:
+        - kind: SendActivity
+          activity: |
+            ## 👥 HR Analytics Summary
+
+            **Period:** ${conversation.hrData.period}
+            **Department:** ${conversation.hrData.department || 'All Departments'}
+
+            ### Workforce Overview
+            👤 **Total Employees:** ${conversation.hrData.totalEmployees}
+            📈 **Headcount Change:** ${conversation.hrData.headcountChange} (${conversation.hrData.headcountChangePercent}%)
+            ⏰ **Total Man-Hours:** ${formatNumber(conversation.hrData.totalManHours)}
+            📊 **Utilization Rate:** ${conversation.hrData.utilizationRate}%
+
+            ### Performance Metrics
+            ✅ **Attendance Rate:** ${conversation.hrData.attendanceRate}%
+            🎯 **Productivity Score:** ${conversation.hrData.productivityScore}/100
+            📚 **Training Completion:** ${conversation.hrData.trainingCompletion}%
+            😊 **Employee Satisfaction:** ${conversation.hrData.satisfactionScore}/10
+
+            ### Department Breakdown
+            ${foreach(conversation.hrData.departmentBreakdown, dept,
+              `**${dept.name}:** ${dept.headcount} employees (${dept.utilization}% utilization)`
+            )}
+
+            ${if(conversation.hrData.insights, 
+              `### 💡 Key Insights\n${conversation.hrData.insights}`, 
+              ''
+            )}
+
+        - kind: SuggestedActions
+          actions:
+            - title: "📊 Department Analysis"
+              type: imBack
+              value: "Show detailed breakdown by department"
+
+            - title: "📈 Trend Analysis"
+              type: imBack
+              value: "Show HR trends over the last 6 months"
+
+            - title: "🎯 Performance Metrics"
+              type: imBack
+              value: "Show detailed performance analytics"
+
+            - title: "📋 Generate Report"
+              type: imBack
+              value: "Create HR summary report"
+
+      elseActions:
+        - kind: SendActivity
+          activity: |
+            I'm unable to access HR data at the moment. This could be due to:
+
+            • Privacy restrictions or insufficient permissions
+            • System maintenance or temporary unavailability
+            • Network connectivity issues
+
+            Please ensure you have the appropriate access rights or contact HR support.
+
+            **Error Details:** ${conversation.hrData.error}
+
+triggers:
+  - kind: OnIntent
+    intent: HRWorkforce
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.HRConnectorUrl}/workforce"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.workforceData"
+
+      - kind: SendActivity
+        activity: |
+          ## 👥 Workforce Analytics
+
+          **Current Headcount:** ${conversation.workforceData.currentHeadcount}
+          **Active Employees:** ${conversation.workforceData.activeEmployees}
+          **Contractors:** ${conversation.workforceData.contractors}
+          **New Hires (This Month):** ${conversation.workforceData.newHires}
+          **Departures (This Month):** ${conversation.workforceData.departures}
+          **Turnover Rate:** ${conversation.workforceData.turnoverRate}%
+
+          ### Workforce by Department
+          ${foreach(conversation.workforceData.byDepartment, dept,
+            `**${dept.name}:** ${dept.headcount} employees\n📊 Capacity: ${dept.capacity}% | 📈 Growth: ${dept.growth}%`
+          )}
+
+          ### Workforce by Location
+          ${foreach(conversation.workforceData.byLocation, location,
+            `📍 **${location.name}:** ${location.headcount} employees (${location.percentage}%)`
+          )}
+
+  - kind: OnIntent
+    intent: HRAttendance
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.HRConnectorUrl}/attendance"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.attendanceData"
+
+      - kind: SendActivity
+        activity: |
+          ## ⏰ Attendance & Time Analytics
+
+          **Overall Attendance Rate:** ${conversation.attendanceData.overallRate}%
+          **Average Hours per Employee:** ${conversation.attendanceData.avgHoursPerEmployee}
+          **Total Man-Hours (This Period):** ${formatNumber(conversation.attendanceData.totalManHours)}
+          **Overtime Hours:** ${formatNumber(conversation.attendanceData.overtimeHours)}
+          **Absence Rate:** ${conversation.attendanceData.absenceRate}%
+
+          ### Attendance by Department
+          ${foreach(conversation.attendanceData.byDepartment, dept,
+            `**${dept.name}:** ${dept.attendanceRate}% ${if(dept.attendanceRate >= 95, '✅', if(dept.attendanceRate >= 90, '⚠️', '❌'))}\nMan-Hours: ${formatNumber(dept.manHours)} | Utilization: ${dept.utilization}%`
+          )}
+
+          ### Top Performing Teams
+          ${foreach(conversation.attendanceData.topPerformers, team,
+            `🏆 **${team.name}:** ${team.attendanceRate}% attendance, ${team.productivityScore} productivity`
+          )}
+
+  - kind: OnIntent
+    intent: HRProductivity
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.HRConnectorUrl}/productivity"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.productivityData"
+
+      - kind: SendActivity
+        activity: |
+          ## 🎯 Productivity & Performance
+
+          **Overall Productivity Score:** ${conversation.productivityData.overallScore}/100
+          **Performance Trend:** ${conversation.productivityData.trend} ${if(conversation.productivityData.improving, '📈', '📉')}
+          **Goals Achievement Rate:** ${conversation.productivityData.goalsAchievement}%
+          **Training Completion Rate:** ${conversation.productivityData.trainingCompletion}%
+
+          ### Productivity by Function
+          ${foreach(conversation.productivityData.byFunction, func,
+            `**${func.name}:** ${func.score}/100 ${if(func.score >= 80, '🟢', if(func.score >= 60, '🟡', '🔴'))}\nEfficiency: ${func.efficiency}% | Quality: ${func.quality}%`
+          )}
+
+          ### Key Performance Indicators
+          ${foreach(conversation.productivityData.kpis, kpi,
+            `📊 **${kpi.name}:** ${kpi.current} ${if(kpi.trend == 'up', '📈', if(kpi.trend == 'down', '📉', '➡️'))}\nTarget: ${kpi.target} | Variance: ${kpi.variance}%`
+          )}
+
+          ### Improvement Opportunities
+          ${foreach(conversation.productivityData.improvements, improvement,
+            `💡 **${improvement.area}:** ${improvement.recommendation}\nPotential Impact: ${improvement.impact}`
+          )}
+
+  - kind: OnIntent
+    intent: HRTraining
+    actions:
+      - kind: HttpRequest
+        method: GET
+        url: "${settings.PowerPlatform.HRConnectorUrl}/training"
+        headers:
+          Authorization: "Bearer ${settings.PowerPlatform.AccessToken}"
+        resultProperty: "conversation.trainingData"
+
+      - kind: SendActivity
+        activity: |
+          ## 📚 Training & Development
+
+          **Overall Completion Rate:** ${conversation.trainingData.completionRate}%
+          **Active Training Programs:** ${conversation.trainingData.activePrograms}
+          **Employees in Training:** ${conversation.trainingData.employeesInTraining}
+          **Compliance Training Status:** ${conversation.trainingData.complianceStatus}%
+
+          ### Training by Category
+          ${foreach(conversation.trainingData.byCategory, category,
+            `**${category.name}:** ${category.completionRate}% complete\nEnrolled: ${category.enrolled} | Completed: ${category.completed}`
+          )}
+
+          ### Upcoming Training Requirements
+          ${foreach(conversation.trainingData.upcoming, training,
+            `📅 **${training.name}**\nDue: ${formatDate(training.dueDate)} | Assigned: ${training.assignedCount} employees`
+          )}
+
+entities:
+  - name: HRMetric
+    type: list
+    values:
+      - Headcount
+      - Attendance
+      - Productivity
+      - Performance
+      - Training
+      - Utilization
+      - Satisfaction
+      - Turnover
+
+  - name: EmployeeType
+    type: list
+    values:
+      - "Full-time"
+      - "Part-time"
+      - "Contractor"
+      - "Temporary"
+      - "Intern"
+
+  - name: PerformanceLevel
+    type: list
+    values:
+      - Excellent
+      - Good
+      - Satisfactory
+      - "Needs Improvement"
+      - Unsatisfactory
+
+  - name: TrainingType
+    type: list
+    values:
+      - "Safety Training"
+      - "Technical Skills"
+      - "Leadership Development"
+      - "Compliance Training"
+      - "Soft Skills"
+      - "Professional Development"

@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swire Intelligence Assistant</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='favicon.ico') }}" />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="header-content">
+          <div class="logo-section">
+            <div class="logo">🤖</div>
+            <div class="title-section">
+              <h1>Swire Intelligence Assistant</h1>
+              <p>Your AI-powered enterprise data assistant</p>
+            </div>
+          </div>
+          <div class="status-indicator">
+            <span class="status-dot online"></span>
+            <span class="status-text">Online</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <!-- Welcome message will be added by JavaScript -->
+      </div>
+
+      <div class="suggestions" id="suggestions">
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('Show me this month\'s financial performance')">
+          📊 Financial Summary
+        </button>
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('What are the recent safety incidents?')">
+          🛡️ Safety Status
+        </button>
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('Get workforce metrics for this quarter')">
+          👥 HR Analytics
+        </button>
+        <button
+          class="suggestion-btn"
+          onclick="sendSuggestion('Search for safety procedures')">
+          🔍 Search Documents
+        </button>
+      </div>
+
+      <div class="chat-input-container">
+        <div class="input-wrapper">
+          <textarea
+            class="chat-input"
+            id="chatInput"
+            placeholder="Ask me about enterprise data, reports, or search for documents..."
+            rows="1"></textarea>
+          <button
+            class="send-btn"
+            id="sendBtn"
+            onclick="sendMessage()"
+            title="Send message">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22,2 15,22 11,13 2,9"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none">
+      <div class="loading-spinner"></div>
+      <p>Processing your request...</p>
+    </div>
+
+    <script>
+      // Configuration
+      const CONFIG = {
+        userId: "{{ user_id }}",
+        environment: "{{ environment }}",
+        apiEndpoint: "/api/chat",
+      };
+
+      // DOM elements
+      const chatMessages = document.getElementById("chatMessages");
+      const chatInput = document.getElementById("chatInput");
+      const sendBtn = document.getElementById("sendBtn");
+      const suggestions = document.getElementById("suggestions");
+      const loadingOverlay = document.getElementById("loadingOverlay");
+
+      // Initialize chat
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeChat();
+        setupEventListeners();
+      });
+
+      function initializeChat() {
+        // Add welcome message
+        const welcomeMessage = {
+          type: "assistant",
+          content: `## 👋 Welcome to Swire Intelligence Assistant!
+
+I'm your AI-powered enterprise data assistant for Swire Renewables. I can help you access and analyze information across all our systems.
+
+### 🎯 What I Can Help With
+
+**💰 Financial Data** - Revenue, expenses, budgets, KPIs  
+**🛡️ HSE Information** - Safety incidents, compliance, environmental metrics  
+**👥 HR Analytics** - Workforce metrics, attendance, performance  
+**📄 Document Search** - Policies, procedures, manuals
+
+### 💡 Try the suggested queries below or ask me anything!
+
+**What would you like to explore today?**`,
+          timestamp: new Date(),
+          actions: [
+            {
+              type: "suggestion",
+              title: "💰 Finance",
+              data: "Show financial performance",
+            },
+            {
+              type: "suggestion",
+              title: "🛡️ Safety",
+              data: "Show safety status",
+            },
+            {
+              type: "suggestion",
+              title: "👥 HR",
+              data: "Show workforce analytics",
+            },
+            {
+              type: "suggestion",
+              title: "🔍 Search",
+              data: "Search documents",
+            },
+          ],
+        };
+
+        addMessage(welcomeMessage);
+        chatInput.focus();
+      }
+
+      function setupEventListeners() {
+        // Auto-resize textarea
+        chatInput.addEventListener("input", function () {
+          this.style.height = "auto";
+          this.style.height = Math.min(this.scrollHeight, 120) + "px";
+        });
+
+        // Send message on Enter (but allow Shift+Enter for new lines)
+        chatInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+
+        // Handle window resize
+        window.addEventListener("resize", function () {
+          scrollToBottom();
+        });
+      }
+
+      function sendSuggestion(text) {
+        chatInput.value = text;
+        sendMessage();
+      }
+
+      async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        // Disable input and show loading
+        setInputState(false);
+
+        // Add user message
+        addMessage({
+          type: "user",
+          content: message,
+          timestamp: new Date(),
+        });
+
+        // Clear input
+        chatInput.value = "";
+        chatInput.style.height = "auto";
+
+        // Hide suggestions
+        suggestions.style.display = "none";
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        try {
+          // Send to API
+          const response = await fetch(CONFIG.apiEndpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: message,
+              userId: CONFIG.userId,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+
+          // Remove typing indicator
+          removeTypingIndicator();
+
+          // Add assistant response
+          addMessage({
+            type: "assistant",
+            content: data.content,
+            timestamp: new Date(),
+            actions: data.actions,
+            isError: data.error,
+          });
+        } catch (error) {
+          console.error("Error sending message:", error);
+          removeTypingIndicator();
+
+          addMessage({
+            type: "assistant",
+            content:
+              "I'm sorry, I'm having trouble connecting right now. Please check your internet connection and try again.",
+            timestamp: new Date(),
+            isError: true,
+          });
+        } finally {
+          // Re-enable input
+          setInputState(true);
+          chatInput.focus();
+        }
+      }
+
+      function addMessage(message) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${message.type}${message.isError ? " error" : ""}`;
+
+        const timeString = message.timestamp.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        let actionsHtml = "";
+        if (message.actions && message.actions.length > 0) {
+          actionsHtml = '<div class="message-actions">';
+          message.actions.forEach((action) => {
+            actionsHtml += `<button class="action-btn" onclick="handleAction('${action.type}', '${action.data}')">${action.title}</button>`;
+          });
+          actionsHtml += "</div>";
+        }
+
+        messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${formatMessage(message.content)}</div>
+                    ${actionsHtml}
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+      }
+
+      function formatMessage(content) {
+        // Convert markdown-like formatting to HTML
+        return content
+          .replace(/## (.*?)$/gm, "<h2>$1</h2>")
+          .replace(/### (.*?)$/gm, "<h3>$1</h3>")
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>")
+          .replace(/`(.*?)`/g, "<code>$1</code>")
+          .replace(/^• (.*?)$/gm, "<li>$1</li>")
+          .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+          .replace(/\n/g, "<br>");
+      }
+
+      function showTypingIndicator() {
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "message assistant typing";
+        typingDiv.id = "typingIndicator";
+        typingDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+        chatMessages.appendChild(typingDiv);
+        scrollToBottom();
+      }
+
+      function removeTypingIndicator() {
+        const typingIndicator = document.getElementById("typingIndicator");
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+      }
+
+      function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function setInputState(enabled) {
+        chatInput.disabled = !enabled;
+        sendBtn.disabled = !enabled;
+
+        if (enabled) {
+          chatInput.classList.remove("disabled");
+          sendBtn.classList.remove("disabled");
+        } else {
+          chatInput.classList.add("disabled");
+          sendBtn.classList.add("disabled");
+        }
+      }
+
+      function handleAction(type, data) {
+        switch (type) {
+          case "suggestion":
+            sendSuggestion(data);
+            break;
+          case "drilldown":
+            sendSuggestion(`Show detailed ${data} analysis`);
+            break;
+          case "export":
+            addMessage({
+              type: "assistant",
+              content: `📋 Generating ${data}... In a production environment, this would create and download a detailed report.`,
+              timestamp: new Date(),
+            });
+            break;
+          case "filter":
+            sendSuggestion(`Filter by ${data}`);
+            break;
+          case "navigate":
+            addMessage({
+              type: "assistant",
+              content: `📂 Opening ${data}... In a production environment, this would open the requested document or page.`,
+              timestamp: new Date(),
+            });
+            break;
+          default:
+            console.log("Unknown action:", type, data);
+        }
+      }
+
+      // Status indicator functionality
+      function updateStatus(status) {
+        const statusDot = document.querySelector(".status-dot");
+        const statusText = document.querySelector(".status-text");
+
+        statusDot.className = `status-dot ${status}`;
+        statusText.textContent =
+          status.charAt(0).toUpperCase() + status.slice(1);
+      }
+
+      // Check connection status periodically
+      setInterval(async function () {
+        try {
+          const response = await fetch("/health");
+          if (response.ok) {
+            updateStatus("online");
+          } else {
+            updateStatus("offline");
+          }
+        } catch (error) {
+          updateStatus("offline");
+        }
+      }, 30000); // Check every 30 seconds
+    </script>
+  </body>
+</html>

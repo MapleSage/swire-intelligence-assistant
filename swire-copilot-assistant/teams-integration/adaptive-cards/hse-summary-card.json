@@ -1,0 +1,274 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.5",
+    "body": [
+        {
+            "type": "Container",
+            "style": "emphasis",
+            "items": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "url": "https://swire-assets.blob.core.windows.net/icons/safety-icon.png",
+                                    "size": "Small",
+                                    "style": "Person"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "🛡️ HSE Summary",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "Accent"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${period} | ${location}",
+                                    "size": "Small",
+                                    "color": "Default",
+                                    "isSubtle": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "🚨 **Total Incidents**",
+                                    "weight": "Bolder",
+                                    "size": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${totalIncidents}",
+                                    "size": "ExtraLarge",
+                                    "weight": "Bolder",
+                                    "color": "${if(totalIncidents > 10, 'Attention', if(totalIncidents > 5, 'Warning', 'Good'))}"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "⚠️ **High Severity**",
+                                    "weight": "Bolder",
+                                    "size": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${highSeverityIncidents}",
+                                    "size": "ExtraLarge",
+                                    "weight": "Bolder",
+                                    "color": "${if(highSeverityIncidents > 0, 'Attention', 'Good')}"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "📊 **Incident Rate**",
+                                    "weight": "Bolder",
+                                    "size": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${incidentRate}",
+                                    "size": "Large",
+                                    "weight": "Bolder"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "per 100k hours",
+                                    "size": "Small",
+                                    "isSubtle": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "FactSet",
+                    "facts": [
+                        {
+                            "title": "🎯 Days Since Last Incident:",
+                            "value": "${daysSinceLastIncident}"
+                        },
+                        {
+                            "title": "✅ Compliance Score:",
+                            "value": "${complianceScore}%"
+                        },
+                        {
+                            "title": "📋 Audits Completed:",
+                            "value": "${auditsCompleted}"
+                        },
+                        {
+                            "title": "⏰ Overdue Actions:",
+                            "value": "${overdueActions}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "### 📋 Recent Incidents",
+                    "weight": "Bolder",
+                    "size": "Medium",
+                    "spacing": "Medium"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "$data": "${recentIncidents}",
+                    "type": "Container",
+                    "style": "emphasis",
+                    "items": [
+                        {
+                            "type": "ColumnSet",
+                            "columns": [
+                                {
+                                    "type": "Column",
+                                    "width": "auto",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "${if(severity == 'Critical', '🔴', if(severity == 'High', '🟠', if(severity == 'Medium', '🟡', '🟢')))}",
+                                            "size": "Medium"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "**${formatDate(date)}** - ${type}",
+                                            "weight": "Bolder",
+                                            "size": "Small"
+                                        },
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "📍 ${location} | 🔄 ${status}",
+                                            "size": "Small",
+                                            "isSubtle": true
+                                        },
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "${description}",
+                                            "size": "Small",
+                                            "wrap": true,
+                                            "maxLines": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "### 📈 Trends & Insights",
+                    "weight": "Bolder",
+                    "size": "Medium",
+                    "spacing": "Medium"
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "${trends}",
+                    "wrap": true,
+                    "size": "Small"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.Submit",
+            "title": "📊 View HSE Trends",
+            "data": {
+                "action": "viewTrends",
+                "type": "hse",
+                "period": "${period}"
+            }
+        },
+        {
+            "type": "Action.Submit",
+            "title": "🔍 Incident Details",
+            "data": {
+                "action": "incidentDetails",
+                "type": "hse"
+            }
+        },
+        {
+            "type": "Action.Submit",
+            "title": "📍 By Location",
+            "data": {
+                "action": "byLocation",
+                "type": "hse"
+            }
+        },
+        {
+            "type": "Action.Submit",
+            "title": "📋 Compliance Report",
+            "data": {
+                "action": "generateReport",
+                "type": "hse",
+                "format": "compliance"
+            }
+        }
+    ],
+    "selectAction": {
+        "type": "Action.Submit",
+        "data": {
+            "action": "cardSelected",
+            "type": "hseSummary"
+        }
+    }
+}

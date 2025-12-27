@@ -1,0 +1,1113 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Swire HSE Data Connector",
+        "description": "Custom connector for accessing Swire Renewables Health, Safety & Environment data including incidents, compliance metrics, and safety analytics",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Swire HSE Team",
+            "email": "hse-support@swire.com"
+        }
+    },
+    "host": "api.swire-hse.internal",
+    "basePath": "/v1",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "oauth2": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+            "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+            "scopes": {
+                "https://api.swire-hse.internal/.default": "Access Swire HSE API"
+            }
+        }
+    },
+    "security": [
+        {
+            "oauth2": [
+                "https://api.swire-hse.internal/.default"
+            ]
+        }
+    ],
+    "paths": {
+        "/incidents": {
+            "get": {
+                "summary": "Get Safety Incidents",
+                "description": "Retrieve safety incident reports and statistics",
+                "operationId": "GetIncidents",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Time period for incident data",
+                        "enum": [
+                            "last_7_days",
+                            "last_30_days",
+                            "current_quarter",
+                            "last_quarter",
+                            "ytd"
+                        ],
+                        "default": "last_30_days"
+                    },
+                    {
+                        "name": "severity",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Incident severity filter",
+                        "enum": [
+                            "critical",
+                            "high",
+                            "medium",
+                            "low"
+                        ]
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Location or site filter"
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Incident status filter",
+                        "enum": [
+                            "open",
+                            "investigating",
+                            "resolved",
+                            "closed"
+                        ]
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Incident type filter",
+                        "enum": [
+                            "near_miss",
+                            "first_aid",
+                            "medical_treatment",
+                            "lost_time",
+                            "environmental",
+                            "property_damage"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Incident data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/IncidentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized - invalid or missing authentication"
+                    },
+                    "403": {
+                        "description": "Forbidden - insufficient permissions"
+                    }
+                }
+            }
+        },
+        "/compliance": {
+            "get": {
+                "summary": "Get Compliance Status",
+                "description": "Retrieve HSE compliance metrics and audit information",
+                "operationId": "GetCompliance",
+                "parameters": [
+                    {
+                        "name": "area",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Compliance area filter",
+                        "enum": [
+                            "safety_management",
+                            "environmental_protection",
+                            "occupational_health",
+                            "emergency_preparedness",
+                            "training"
+                        ]
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Location filter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Compliance data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/ComplianceResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/safety-metrics": {
+            "get": {
+                "summary": "Get Safety Performance Metrics",
+                "description": "Retrieve key safety performance indicators and trends",
+                "operationId": "GetSafetyMetrics",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Metrics period",
+                        "enum": [
+                            "current_month",
+                            "current_quarter",
+                            "ytd",
+                            "rolling_12_months"
+                        ],
+                        "default": "current_quarter"
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Location filter"
+                    },
+                    {
+                        "name": "include_benchmarks",
+                        "in": "query",
+                        "type": "boolean",
+                        "required": false,
+                        "description": "Include industry benchmarks",
+                        "default": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Safety metrics retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/SafetyMetricsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/environmental": {
+            "get": {
+                "summary": "Get Environmental Data",
+                "description": "Retrieve environmental impact metrics and compliance data",
+                "operationId": "GetEnvironmentalData",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Data period",
+                        "enum": [
+                            "current_month",
+                            "current_quarter",
+                            "ytd"
+                        ],
+                        "default": "current_quarter"
+                    },
+                    {
+                        "name": "metric_type",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Environmental metric type",
+                        "enum": [
+                            "emissions",
+                            "waste",
+                            "water_usage",
+                            "energy_consumption",
+                            "biodiversity"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Environmental data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/EnvironmentalResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/training": {
+            "get": {
+                "summary": "Get HSE Training Data",
+                "description": "Retrieve HSE training completion and compliance information",
+                "operationId": "GetHSETraining",
+                "parameters": [
+                    {
+                        "name": "training_type",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Type of HSE training",
+                        "enum": [
+                            "safety_induction",
+                            "emergency_response",
+                            "environmental_awareness",
+                            "risk_assessment",
+                            "incident_investigation"
+                        ]
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Location filter"
+                    },
+                    {
+                        "name": "compliance_status",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Training compliance status",
+                        "enum": [
+                            "compliant",
+                            "overdue",
+                            "expiring_soon"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HSE training data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/HSETrainingResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/trends": {
+            "get": {
+                "summary": "Get HSE Trends Analysis",
+                "description": "Retrieve trend analysis and predictive insights for HSE metrics",
+                "operationId": "GetHSETrends",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Analysis period",
+                        "enum": [
+                            "last_6_months",
+                            "last_12_months",
+                            "last_24_months"
+                        ],
+                        "default": "last_12_months"
+                    },
+                    {
+                        "name": "metric",
+                        "in": "query",
+                        "type": "string",
+                        "required": false,
+                        "description": "Specific metric for trend analysis",
+                        "enum": [
+                            "incident_rate",
+                            "compliance_score",
+                            "training_completion",
+                            "environmental_impact"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HSE trends retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/HSETrendsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/hse-summary": {
+            "post": {
+                "summary": "Get HSE Summary",
+                "description": "Generate comprehensive HSE summary based on query parameters",
+                "operationId": "GetHSESummary",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/HSEQueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HSE summary generated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/HSESummaryResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "IncidentResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "total_incidents": {
+                    "type": "integer"
+                },
+                "high_severity_incidents": {
+                    "type": "integer"
+                },
+                "incident_rate": {
+                    "type": "number",
+                    "format": "double",
+                    "description": "Incidents per 100,000 hours worked"
+                },
+                "days_since_last_incident": {
+                    "type": "integer"
+                },
+                "incidents_by_severity": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IncidentBySeverity"
+                    }
+                },
+                "incidents_by_type": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IncidentByType"
+                    }
+                },
+                "recent_incidents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IncidentDetail"
+                    }
+                }
+            }
+        },
+        "ComplianceResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "overall_score": {
+                    "type": "number",
+                    "format": "double",
+                    "description": "Overall compliance score percentage"
+                },
+                "last_audit_date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "next_audit_due": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "compliance_by_area": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ComplianceArea"
+                    }
+                },
+                "action_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ActionItem"
+                    }
+                },
+                "certifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Certification"
+                    }
+                }
+            }
+        },
+        "SafetyMetricsResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "ltir": {
+                    "type": "number",
+                    "format": "double",
+                    "description": "Lost Time Injury Rate"
+                },
+                "trir": {
+                    "type": "number",
+                    "format": "double",
+                    "description": "Total Recordable Injury Rate"
+                },
+                "near_miss_ratio": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "safety_observations": {
+                    "type": "integer"
+                },
+                "man_hours_worked": {
+                    "type": "integer"
+                },
+                "benchmarks": {
+                    "$ref": "#/definitions/SafetyBenchmarks"
+                },
+                "trends": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SafetyTrend"
+                    }
+                }
+            }
+        },
+        "EnvironmentalResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "carbon_emissions": {
+                    "$ref": "#/definitions/EmissionData"
+                },
+                "waste_management": {
+                    "$ref": "#/definitions/WasteData"
+                },
+                "water_usage": {
+                    "$ref": "#/definitions/WaterData"
+                },
+                "energy_consumption": {
+                    "$ref": "#/definitions/EnergyData"
+                },
+                "environmental_incidents": {
+                    "type": "integer"
+                },
+                "compliance_status": {
+                    "type": "string",
+                    "enum": [
+                        "compliant",
+                        "minor_issues",
+                        "major_issues"
+                    ]
+                }
+            }
+        },
+        "HSETrainingResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "overall_completion_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "employees_trained": {
+                    "type": "integer"
+                },
+                "training_hours": {
+                    "type": "integer"
+                },
+                "compliance_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "training_by_type": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TrainingByType"
+                    }
+                },
+                "overdue_training": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/OverdueTraining"
+                    }
+                }
+            }
+        },
+        "HSETrendsResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "overall_trend": {
+                    "type": "string",
+                    "enum": [
+                        "improving",
+                        "stable",
+                        "declining"
+                    ]
+                },
+                "trend_metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TrendMetric"
+                    }
+                },
+                "insights": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/HSEInsight"
+                    }
+                },
+                "predictions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/HSEPrediction"
+                    }
+                }
+            }
+        },
+        "HSEQueryRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Natural language HSE query"
+                },
+                "timeframe": {
+                    "type": "string",
+                    "description": "Time period for the query"
+                },
+                "location": {
+                    "type": "string",
+                    "description": "Location filter"
+                },
+                "severity": {
+                    "type": "string",
+                    "description": "Severity filter for incidents"
+                },
+                "userId": {
+                    "type": "string",
+                    "description": "User ID for audit logging"
+                }
+            },
+            "required": [
+                "query",
+                "userId"
+            ]
+        },
+        "HSESummaryResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "total_incidents": {
+                    "type": "integer"
+                },
+                "high_severity_incidents": {
+                    "type": "integer"
+                },
+                "incident_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "days_since_last_incident": {
+                    "type": "integer"
+                },
+                "compliance_score": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "audits_completed": {
+                    "type": "integer"
+                },
+                "overdue_actions": {
+                    "type": "integer"
+                },
+                "recent_incidents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IncidentSummary"
+                    }
+                },
+                "trends": {
+                    "type": "string",
+                    "description": "AI-generated trend analysis"
+                },
+                "recommendations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "IncidentBySeverity": {
+            "type": "object",
+            "properties": {
+                "severity": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "IncidentByType": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "trend": {
+                    "type": "string",
+                    "enum": [
+                        "increasing",
+                        "stable",
+                        "decreasing"
+                    ]
+                }
+            }
+        },
+        "IncidentDetail": {
+            "type": "object",
+            "properties": {
+                "incident_id": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "severity": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "assigned_to": {
+                    "type": "string"
+                }
+            }
+        },
+        "IncidentSummary": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "severity": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "ComplianceArea": {
+            "type": "object",
+            "properties": {
+                "area": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "compliant",
+                        "minor_issues",
+                        "major_issues"
+                    ]
+                },
+                "last_assessed": {
+                    "type": "string",
+                    "format": "date"
+                }
+            }
+        },
+        "ActionItem": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "string",
+                    "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                    ]
+                },
+                "due_date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "assigned_to": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "open",
+                        "in_progress",
+                        "completed",
+                        "overdue"
+                    ]
+                }
+            }
+        },
+        "Certification": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "valid",
+                        "expiring",
+                        "expired"
+                    ]
+                },
+                "expiry_date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "issuing_body": {
+                    "type": "string"
+                }
+            }
+        },
+        "SafetyBenchmarks": {
+            "type": "object",
+            "properties": {
+                "industry_ltir": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "industry_trir": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "best_in_class_ltir": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "best_in_class_trir": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "SafetyTrend": {
+            "type": "object",
+            "properties": {
+                "metric": {
+                    "type": "string"
+                },
+                "current_value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "previous_value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "trend": {
+                    "type": "string",
+                    "enum": [
+                        "improving",
+                        "stable",
+                        "declining"
+                    ]
+                },
+                "change_percentage": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "EmissionData": {
+            "type": "object",
+            "properties": {
+                "total_co2_tonnes": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "scope1_emissions": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "scope2_emissions": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "scope3_emissions": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "reduction_target": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "progress_to_target": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "WasteData": {
+            "type": "object",
+            "properties": {
+                "total_waste_tonnes": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "recycled_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "landfill_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "hazardous_waste_tonnes": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "WaterData": {
+            "type": "object",
+            "properties": {
+                "total_consumption_m3": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "recycled_water_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "discharge_quality_compliance": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "EnergyData": {
+            "type": "object",
+            "properties": {
+                "total_consumption_mwh": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "renewable_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "energy_intensity": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "TrainingByType": {
+            "type": "object",
+            "properties": {
+                "training_type": {
+                    "type": "string"
+                },
+                "completion_rate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "employees_completed": {
+                    "type": "integer"
+                },
+                "total_required": {
+                    "type": "integer"
+                }
+            }
+        },
+        "OverdueTraining": {
+            "type": "object",
+            "properties": {
+                "training_type": {
+                    "type": "string"
+                },
+                "overdue_count": {
+                    "type": "integer"
+                },
+                "average_days_overdue": {
+                    "type": "integer"
+                }
+            }
+        },
+        "TrendMetric": {
+            "type": "object",
+            "properties": {
+                "metric_name": {
+                    "type": "string"
+                },
+                "current_value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "trend_direction": {
+                    "type": "string",
+                    "enum": [
+                        "up",
+                        "down",
+                        "stable"
+                    ]
+                },
+                "change_percentage": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "significance": {
+                    "type": "string",
+                    "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                    ]
+                }
+            }
+        },
+        "HSEInsight": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "impact": {
+                    "type": "string",
+                    "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                    ]
+                },
+                "recommendation": {
+                    "type": "string"
+                }
+            }
+        },
+        "HSEPrediction": {
+            "type": "object",
+            "properties": {
+                "metric": {
+                    "type": "string"
+                },
+                "predicted_value": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "confidence_level": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "time_horizon": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "x-ms-connector-metadata": [
+        {
+            "propertyName": "Website",
+            "propertyValue": "https://swire.com"
+        },
+        {
+            "propertyName": "Privacy policy",
+            "propertyValue": "https://swire.com/privacy"
+        },
+        {
+            "propertyName": "Categories",
+            "propertyValue": "Safety;Environment;Data"
+        }
+    ]
+}

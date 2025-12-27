@@ -1,0 +1,170 @@
+{
+    "name": "swire-knowledge-base",
+    "fields": [
+        {
+            "name": "id",
+            "type": "Edm.String",
+            "key": true,
+            "searchable": false,
+            "filterable": false,
+            "sortable": false,
+            "facetable": false,
+            "retrievable": true
+        },
+        {
+            "name": "title",
+            "type": "Edm.String",
+            "searchable": true,
+            "filterable": true,
+            "sortable": true,
+            "facetable": false,
+            "retrievable": true,
+            "analyzer": "en.microsoft"
+        },
+        {
+            "name": "content",
+            "type": "Edm.String",
+            "searchable": true,
+            "filterable": false,
+            "sortable": false,
+            "facetable": false,
+            "retrievable": true,
+            "analyzer": "en.microsoft"
+        },
+        {
+            "name": "source",
+            "type": "Edm.String",
+            "searchable": false,
+            "filterable": true,
+            "sortable": false,
+            "facetable": true,
+            "retrievable": true
+        },
+        {
+            "name": "department",
+            "type": "Edm.String",
+            "searchable": false,
+            "filterable": true,
+            "sortable": false,
+            "facetable": true,
+            "retrievable": true
+        },
+        {
+            "name": "documentType",
+            "type": "Edm.String",
+            "searchable": false,
+            "filterable": true,
+            "sortable": false,
+            "facetable": true,
+            "retrievable": true
+        },
+        {
+            "name": "lastModified",
+            "type": "Edm.DateTimeOffset",
+            "searchable": false,
+            "filterable": true,
+            "sortable": true,
+            "facetable": false,
+            "retrievable": true
+        },
+        {
+            "name": "accessLevel",
+            "type": "Edm.String",
+            "searchable": false,
+            "filterable": true,
+            "sortable": false,
+            "facetable": true,
+            "retrievable": true
+        },
+        {
+            "name": "tags",
+            "type": "Collection(Edm.String)",
+            "searchable": true,
+            "filterable": true,
+            "sortable": false,
+            "facetable": true,
+            "retrievable": true
+        },
+        {
+            "name": "contentVector",
+            "type": "Collection(Edm.Single)",
+            "searchable": true,
+            "filterable": false,
+            "sortable": false,
+            "facetable": false,
+            "retrievable": false,
+            "dimensions": 1536,
+            "vectorSearchProfile": "swire-vector-profile"
+        }
+    ],
+    "vectorSearch": {
+        "algorithms": [
+            {
+                "name": "swire-hnsw-algorithm",
+                "kind": "hnsw",
+                "hnswParameters": {
+                    "metric": "cosine",
+                    "m": 4,
+                    "efConstruction": 400,
+                    "efSearch": 500
+                }
+            }
+        ],
+        "profiles": [
+            {
+                "name": "swire-vector-profile",
+                "algorithm": "swire-hnsw-algorithm",
+                "vectorizer": "swire-openai-vectorizer"
+            }
+        ],
+        "vectorizers": [
+            {
+                "name": "swire-openai-vectorizer",
+                "kind": "azureOpenAI",
+                "azureOpenAIParameters": {
+                    "resourceUri": "https://swire-copilot-dev-openai.openai.azure.com",
+                    "deploymentId": "text-embedding-ada-002",
+                    "apiKey": null
+                }
+            }
+        ]
+    },
+    "semantic": {
+        "configurations": [
+            {
+                "name": "swire-semantic-config",
+                "prioritizedFields": {
+                    "titleField": {
+                        "fieldName": "title"
+                    },
+                    "prioritizedContentFields": [
+                        {
+                            "fieldName": "content"
+                        }
+                    ],
+                    "prioritizedKeywordsFields": [
+                        {
+                            "fieldName": "tags"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "suggesters": [
+        {
+            "name": "swire-suggester",
+            "searchMode": "analyzingInfixMatching",
+            "sourceFields": [
+                "title",
+                "tags"
+            ]
+        }
+    ],
+    "corsOptions": {
+        "allowedOrigins": [
+            "*"
+        ],
+        "maxAgeInSeconds": 300
+    }
+}
