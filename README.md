@@ -1,6 +1,6 @@
 # Swire Intelligence Assistant
 
-Enterprise AI assistant with multi-agent orchestration, RAG pipeline, and multi-cloud knowledge base integration.
+Enterprise AI assistant with multi-agent orchestration and Azure-powered RAG pipeline.
 
 ## 🏗️ Architecture
 
@@ -8,7 +8,7 @@ Enterprise AI assistant with multi-agent orchestration, RAG pipeline, and multi-
 ┌─────────────────────────────────────────────────────────────────┐
 │                         FRONTEND (Next.js)                       │
 │                    https://sagegreen.vercel.app                  │
-└────────────────────────────┬────────────────────────────────────┘
+└────────────────────────┬────────────────────────────────────────┘
                              │
                     ┌────────┴────────┐
                     │  Chat Request   │
@@ -20,20 +20,22 @@ Enterprise AI assistant with multi-agent orchestration, RAG pipeline, and multi-
 ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
 │   PRIMARY    │    │   FALLBACK   │    │ LAST RESORT  │
 │              │    │              │    │              │
-│  Bedrock KB  │───▶│   FastAPI    │───▶│   Cached     │
-│  + Claude    │    │  Multi-Agent │    │  Responses   │
+│  Azure AI    │───▶│   FastAPI    │───▶│   Cached     │
+│  + GPT-4o    │    │  Multi-Agent │    │  Responses   │
 └──────────────┘    └──────────────┘    └──────────────┘
 ```
 
 ## 🔄 Chat Flow
 
-### 1. PRIMARY: AWS Bedrock Knowledge Base
-- **Endpoint**: `/api/bedrock-agent`
-- **Model**: Claude 3 Sonnet via Bedrock
-- **Knowledge Base**: `BELWMDUYUJ` (OpenSearch Serverless)
-- **Data Source**: S3 bucket `bedrock-agent-kb-swire`
-- **RAG**: RetrieveAndGenerateCommand with semantic search
-- **Fallback Trigger**: Claude content filter or API errors
+### 1. PRIMARY: Azure OpenAI with Cognitive Search
+- **Endpoint**: `/api/azure-kb-chat`
+- **Model**: GPT-4o via Azure OpenAI
+- **Knowledge Base**: Azure Cognitive Search
+- **Indices**:
+  - `swire-wind-services` (37 documents)
+  - `swire-knowledge-index`
+- **RAG**: Semantic search with vector embeddings
+- **Fallback Trigger**: API errors or unavailable service
 
 ### 2. FALLBACK: FastAPI Multi-Agent System
 - **Endpoint**: `http://localhost:8000/chat`
@@ -42,7 +44,7 @@ Enterprise AI assistant with multi-agent orchestration, RAG pipeline, and multi-
   - `MultiAgentOrchestrator` - Routes queries to specialist agents
   - `SwireSpecialistAgent` - Domain experts (wind, solar, ops, safety, finance)
   - `RAGPipeline` - FAISS vector search on local documents
-  - `BedrockClient` - Direct Bedrock model invocation
+  - `AzureOpenAIClient` - Direct Azure OpenAI invocation
 
 ### 3. LAST RESORT: Cached Responses
 - Hardcoded responses for common queries
@@ -52,32 +54,18 @@ Enterprise AI assistant with multi-agent orchestration, RAG pipeline, and multi-
 
 ## 📊 Knowledge Base Architecture
 
-### AWS Bedrock Knowledge Base (Primary)
+### Azure Cognitive Search (Primary)
 ```
-Knowledge Base: BELWMDUYUJ
-├── Storage: OpenSearch Serverless
-├── Embeddings: Amazon Titan Embed Text v2 (1024 dimensions)
-├── Data Sources:
-│   ├── S3: bedrock-agent-kb-swire/swire-re/
-│   │   ├── swire-re-overview.txt
-│   │   ├── swire-re-capabilities.txt
-│   │   ├── swire-re-formosa-wind.txt
-│   │   ├── swire-re-sustainability.txt
-│   │   ├── swire-re-contact.txt
-│   │   └── ceo-ryan-smith.txt (CEO info)
-│   └── Web Crawler: https://swire-re.com/
-└── Model: Claude 3 Sonnet (anthropic.claude-3-sonnet-20240229-v1:0)
+Search Service: ai-parvinddutta9607ai577068173144.search.windows.net
+├── Resource Group: swire-rg (East US)
+├── Subscription: Azure subscription 1
+├── Indices:
+│   ├── swire-wind-services (37 documents)
+│   └── swire-knowledge-index
+└── Integration: Azure OpenAI embeddings
 ```
 
-### Azure Cognitive Search (Available)
-```
-Endpoint: ai-parvinddutta9607ai577068173144.search.windows.net
-├── Index: swire-wind-services (37 documents)
-├── Index: swire-knowledge-index
-└── Integration: /api/azure-kb-chat (not currently used)
-```
-
-### Local FAISS Vector Store (FastAPI)
+### Local FAISS Vector Store (FastAPI Fallback)
 ```
 Location: swire-agent-core/data/vector_index
 ├── Model: sentence-transformers/all-MiniLM-L6-v2
@@ -131,22 +119,9 @@ swire-agent-core/src/tools/
 swire-agent-core/src/core/
 ├── agent_core.py           # Langchain-based agent
 ├── azure_agent_core.py     # Azure OpenAI integration
-├── bedrock_client.py       # AWS Bedrock client
 ├── rag_pipeline.py         # FAISS vector search
 └── simple_agent_core.py    # Lightweight fallback
 ```
-
-## 🔐 Authentication
-
-### AWS Cognito
-- **User Pool**: `us-east-1_bdqsU9GjR`
-- **Client ID**: `3d51afuu9se41jk2gvmfr040dv`
-- **Methods**: Email/Password, Social (Google, Facebook, Apple), Biometric
-
-### Session Management
-- JWT tokens via Amplify
-- Secure token refresh
-- Multi-factor authentication support
 
 ## 🌐 Deployment
 
@@ -156,31 +131,28 @@ swire-agent-core/src/core/
 - **Auto-deploy**: GitHub main branch
 - **Build**: `npm run build`
 
-### Backend (Local/Docker)
+### Backend (Azure Container Instances)
+- **Container**: swire-agent-api
+- **Resource Group**: swire-rg (East US)
+- **Public IP**: 20.72.179.10
+- **FQDN**: swire-intelligence.eastus.azurecontainer.io
+- **Status**: Running
+- **OS**: Linux
+- **Endpoints**:
+  - Health: `http://20.72.179.10/health`
+  - Chat: `http://20.72.179.10/chat`
+
+### Local Development (Optional)
 ```bash
 cd swire-agent-core
 pip install -r requirements.txt
 python app.py  # Runs on port 8000
 ```
 
-### Docker Deployment
-```bash
-cd swire-agent-core
-docker-compose up -d
-```
-
 ## 📦 Environment Variables
 
 ### Frontend (.env.local)
 ```bash
-# AWS Bedrock
-AWS_ACCESS_KEY_ID=AKIAZ4JEEV374AIOFAV6
-AWS_SECRET_ACCESS_KEY=***
-AWS_REGION=us-east-1
-BEDROCK_KNOWLEDGE_BASE_ID=BELWMDUYUJ
-BEDROCK_AGENT_ID=XMJHPK00RO
-BEDROCK_AGENT_ALIAS_ID=PDGGKSDLVP
-
 # Azure OpenAI
 AZURE_OPENAI_ENDPOINT=https://ai-parvinddutta9607ai577068173144.openai.azure.com
 AZURE_OPENAI_KEY=***
@@ -191,20 +163,18 @@ AZURE_SEARCH_ENDPOINT=https://ai-parvinddutta9607ai577068173144.search.windows.n
 AZURE_SEARCH_KEY=***
 AZURE_SEARCH_INDEX=swire-wind-services
 
-# Cognito
-NEXT_PUBLIC_COGNITO_USER_POOL_ID=us-east-1_bdqsU9GjR
-NEXT_PUBLIC_COGNITO_CLIENT_ID=3d51afuu9se41jk2gvmfr040dv
-
 # Backend
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+NEXT_PUBLIC_BACKEND_URL=http://20.72.179.10
+# For local development: http://localhost:8000
 ```
 
 ### Backend (.env)
 ```bash
-AWS_ACCESS_KEY_ID=***
-AWS_SECRET_ACCESS_KEY=***
-AWS_REGION=us-east-1
-BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
+AZURE_OPENAI_ENDPOINT=https://ai-parvinddutta9607ai577068173144.openai.azure.com
+AZURE_OPENAI_KEY=***
+AZURE_OPENAI_DEPLOYMENT=gpt-4o
+AZURE_SEARCH_ENDPOINT=https://ai-parvinddutta9607ai577068173144.search.windows.net
+AZURE_SEARCH_KEY=***
 ```
 
 ## 🚀 Quick Start
@@ -235,78 +205,96 @@ npm run dev
 
 ## 📝 Knowledge Base Management
 
-### Upload to S3 (Bedrock KB)
+### Update Azure Cognitive Search Index
 ```bash
-cd swire-agent-core
-export AWS_ACCESS_KEY_ID=***
-export AWS_SECRET_ACCESS_KEY=***
-
-# Upload CEO data
-python upload-ceo-to-s3.py
-
-# Sync knowledge base
-aws bedrock-agent start-ingestion-job \
-  --knowledge-base-id BELWMDUYUJ \
-  --data-source-id AAACOA35ZY
+# Upload documents via Azure Portal or SDK
+# Navigate to: Azure Portal > swire-rg > Cognitive Search
+# Upload to index: swire-wind-services or swire-knowledge-index
 ```
 
-### Check Ingestion Status
+### Verify Index Contents
 ```bash
-aws bedrock-agent list-ingestion-jobs \
-  --knowledge-base-id BELWMDUYUJ \
-  --data-source-id AAACOA35ZY
+# Via Azure Portal
+# Navigate to: Search Service > Indexes > swire-wind-services > Search Explorer
 ```
 
 ## 🧪 Testing
 
-### Test Bedrock KB
+### Test Azure OpenAI + Cognitive Search
 ```bash
-curl -X POST http://localhost:3000/api/bedrock-agent \
+curl -X POST http://localhost:3000/api/azure-kb-chat \
   -H "Content-Type: application/json" \
-  -d '{"query": "Who is the CEO of Swire Renewable Energy?"}'
+  -d '{"query": "Tell me about wind energy services"}'
 ```
 
-### Test FastAPI
+### Test Azure Container Instance (FastAPI)
+```bash
+# Health check
+curl http://20.72.179.10/health
+
+# Chat endpoint
+curl -X POST http://20.72.179.10/chat \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Tell me about wind energy services"}'
+```
+
+### Test Local FastAPI (Development)
 ```bash
 curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"query": "Tell me about wind energy services"}'
 ```
 
-### Health Check
-```bash
-curl http://localhost:8000/health
-```
-
 ## 📊 System Status
 
 ### Active Services
-- ✅ AWS Bedrock Knowledge Base (BELWMDUYUJ)
-- ✅ S3 Bucket (bedrock-agent-kb-swire)
-- ✅ AWS Cognito Authentication
+- ✅ Azure OpenAI (GPT-4o)
+- ✅ Azure Cognitive Search (swire-wind-services)
 - ✅ Next.js Frontend (Vercel)
-- ✅ FastAPI Backend (localhost:8000)
+- ✅ FastAPI Backend (Azure Container Instance - swire-agent-api)
 - ✅ Multi-Agent Orchestrator
-- ⚠️ Azure Cognitive Search (configured, not primary)
 
-### AWS Account
-- **Account ID**: 679217508095
-- **User**: NickD
-- **Region**: us-east-1
+## 🌍 Azure Resources
 
-### Azure Resources
-- **Project**: swirere-3699 (eastus2)
-- **OpenAI**: sageinsure-openai (eastus)
-- **Search**: ai-parvinddutta9607ai577068173144
+### Resource Group: swire-copilot-dev-rg
+- **Region**: West Europe
+- **Subscription**: Azure subscription 1
+- **Purpose**: Development environment
+
+### Resource Group: swire-rg
+- **Region**: East US
+- **Subscription**: Azure subscription 1
+- **Resources**:
+  - Azure OpenAI Service
+  - Cognitive Search Service (ai-parvinddutta9607ai577068173144)
+  - Search Indices (swire-wind-services, swire-knowledge-index)
+  - Container Instance: swire-agent-api (20.72.179.10)
 
 ## 🔍 Troubleshooting
 
-### Bedrock KB Returns "Unable to assist"
-- Claude content filter triggered
-- System automatically falls back to FastAPI
-- Check S3 bucket has relevant documents
+### Azure OpenAI Not Responding
+- Check deployment name matches environment variable
+- Verify API key is valid
+- Check quota limits in Azure Portal
 
-### FastAPI Not Responding
+### Cognitive Search Empty Results
+- Verify index has documents via Search Explorer
+- Check query syntax and field mappings
+- Ensure embeddings are properly configured
+
+### Azure Container Instance Not Responding
+```bash
+# Check health endpoint
+curl http://20.72.179.10/health
+
+# Restart via Azure Portal
+# Navigate to: Azure Portal > swire-rg > swire-agent-api > Restart
+
+# Check logs via Azure Portal
+# Navigate to: Azure Portal > swire-agent-api > Containers > Logs
+```
+
+### Local FastAPI Not Responding (Development)
 ```bash
 # Check if running
 ps aux | grep "python app.py"
@@ -317,22 +305,15 @@ python app.py
 ```
 
 ### Knowledge Base Empty
-```bash
-# List S3 contents
-aws s3 ls s3://bedrock-agent-kb-swire/swire-re/ --recursive
-
-# Upload missing data
-aws s3 cp ceo-ryan-smith.txt s3://bedrock-agent-kb-swire/swire-re/
-
-# Trigger sync
-aws bedrock-agent start-ingestion-job \
-  --knowledge-base-id BELWMDUYUJ \
-  --data-source-id AAACOA35ZY
-```
+- Navigate to Azure Portal
+- Go to Cognitive Search Service
+- Upload documents to appropriate index
+- Rebuild index if necessary
 
 ## 📚 Documentation
 
-- [AWS Bedrock Docs](https://docs.aws.amazon.com/bedrock/)
+- [Azure OpenAI Docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
+- [Azure Cognitive Search Docs](https://learn.microsoft.com/en-us/azure/search/)
 - [FastAPI Docs](https://fastapi.tiangolo.com/)
 - [Next.js Docs](https://nextjs.org/docs)
 - [Langchain Docs](https://python.langchain.com/)
@@ -350,6 +331,6 @@ Proprietary - Swire Renewable Energy
 
 ---
 
-**Last Updated**: October 18, 2025
-**Version**: 2.0.0
-**Status**: Production
+**Last Updated**: December 27, 2025
+**Version**: 3.0.0
+**Status**: Production (Azure-only)
