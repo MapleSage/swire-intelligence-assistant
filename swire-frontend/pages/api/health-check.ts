@@ -17,6 +17,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Test Bedrock
   try {
+    if (!process.env.BEDROCK_AGENT_ID || !process.env.BEDROCK_AGENT_ALIAS_ID || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+      results.bedrock.status = 'not_configured';
+    } else {
     const client = new BedrockAgentRuntimeClient({
       region: process.env.AWS_REGION || 'us-east-1',
       credentials: {
@@ -38,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ]);
 
     results.bedrock.status = 'healthy';
+    }
   } catch (error: any) {
     results.bedrock.status = 'error';
     results.bedrock.error = {
@@ -51,10 +55,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
     const apiKey = process.env.AZURE_OPENAI_KEY;
+    const deployment = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o';
     
     if (endpoint && apiKey) {
       const response = await fetch(
-        `${endpoint}/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview`,
+        `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=2024-08-01-preview`,
         {
           method: 'POST',
           headers: {

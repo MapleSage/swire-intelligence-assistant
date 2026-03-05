@@ -203,6 +203,32 @@ npm run dev
 - Local: http://localhost:3000
 - Production: https://sagegreen.vercel.app
 
+## 🐳 Container-First Workflow (Recommended)
+
+### 1. Configure Environment
+```bash
+cp .env.example .env
+# fill Azure keys/endpoints in .env
+```
+
+### 2. Start App Stack Locally (Frontend + Backend)
+```bash
+docker compose up --build
+```
+
+### 3. Ingest Operations Manuals to Blob + Vector Search
+Place your manuals under `./enterprise-data` with department folders, then run:
+```bash
+docker compose --profile ingest run --rm data-ingest
+```
+
+This uploads source files to Azure Blob Storage and writes vectorized chunks into `AZURE_SEARCH_INDEX`.
+
+### 4. Deploy Containers to Azure App Service
+```bash
+./deploy_to_azure.sh
+```
+
 ## 📝 Knowledge Base Management
 
 ### Update Azure Cognitive Search Index

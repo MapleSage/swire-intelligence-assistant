@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-03-04T17:09:07.125070+00:00",
+  "source": "https://swire-re.com/base-sitemap.xml",
+  "departments": {
+    "blades": {
+      "file": "enterprise-data/blades/policy_kb_seed.md",
+      "source_count": 9
+    },
+    "pre-assembly-installation": {
+      "file": "enterprise-data/pre_assembly_installation/policy_kb_seed.md",
+      "source_count": 1
+    },
+    "service-maintenance": {
+      "file": "enterprise-data/service_maintenance/policy_kb_seed.md",
+      "source_count": 3
+    },
+    "hr": {
+      "file": "enterprise-data/hr/policy_kb_seed.md",
+      "source_count": 3
+    },
+    "about-swire-renewable": {
+      "file": "enterprise-data/about_swire_renewable/policy_kb_seed.md",
+      "source_count": 10
+    },
+    "general": {
+      "file": "enterprise-data/general/policy_kb_seed.md",
+      "source_count": 20
+    }
+  }
+}

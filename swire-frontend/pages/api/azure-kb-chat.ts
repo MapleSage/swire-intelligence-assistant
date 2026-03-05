@@ -11,7 +11,7 @@ const searchAzureKB = async (query: string) => {
       body: JSON.stringify({
         search: query,
         top: 5,
-        select: 'content,title,metadata',
+        select: 'content,title,department,category,source',
         searchMode: 'any',
         queryType: 'simple'
       }),
@@ -48,22 +48,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Prepare context from KB results
     const context = kbResults.length > 0
       ? kbResults.map((result: any, index: number) =>
-          `[${index + 1}] ${result.title || 'Document'}: ${result.content}`
+          `[${index + 1}] ${result.title || 'Document'} (${result.department || result.category || 'general'})\n${result.content}`
         ).join('\n\n')
       : 'No specific knowledge base results found.';
 
     // Create enhanced prompt with KB context
-    const systemPrompt = `You are SageGreen AI Assistant, an expert in ESG (Environmental, Social, and Governance) compliance, renewable energy, sustainability metrics, and environmental insights.
+    const systemPrompt = `You are Swire Intelligence Assistant for Swire Renewable.
+Focus on operations manuals and HR/policy guidance for these departments:
+- Blades
+- Pre-Assembly & Installation
+- Service & Maintenance
+- HR
+- About Swire Renewable
+- General departments
 
 Knowledge Base Context:
 ${context}
 
 Your role is to:
-- Provide accurate information about ESG compliance and sustainability
-- Offer guidance on renewable energy solutions (wind, solar, etc.)
-- Help with sustainability metrics and carbon footprint analysis
-- Answer questions about environmental regulations and best practices
-- Be helpful, concise, and professional`;
+- Give practical, department-specific operational answers
+- Cite when an answer is based on indexed documents vs general guidance
+- Ask a clarifying question when user intent is ambiguous
+- Be concise, professional, and action-oriented`;
 
     const userMessage = query;
 

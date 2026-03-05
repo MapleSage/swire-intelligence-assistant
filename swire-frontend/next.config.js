@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: "standalone",
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://ai-parvinddutta9607ai577068173144.eastus.inference.ml.azure.com/score',
     NEXT_PUBLIC_AWS_REGION: process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1',
@@ -10,4 +11,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig// Force rebuild Fri Oct 17 21:31:22 IST 2025
+module.exports = nextConfig

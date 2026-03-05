@@ -3,7 +3,7 @@ import { Wind, Zap, Globe, Users, Award, TrendingUp } from "lucide-react";
 
 const SwireCompanyInfo: React.FC = () => {
   const stats = [
-    { icon: Wind, label: "Wind Farms", value: "25+", color: "text-green-600" },
+    { icon: Wind, label: "Wind Farms", value: "25+", color: "text-red-600" },
     { icon: Zap, label: "MW Capacity", value: "2,500+", color: "text-blue-600" },
     { icon: Globe, label: "Countries", value: "8", color: "text-purple-600" },
     { icon: Users, label: "Employees", value: "1,250", color: "text-orange-600" },
@@ -35,7 +35,7 @@ const SwireCompanyInfo: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div className="text-center mb-6">
-        <div className="w-16 h-16 bg-green-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
+        <div className="w-16 h-16 bg-red-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
           <Wind className="w-8 h-8 text-white" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Swire Renewables</h2>
@@ -61,7 +61,7 @@ const SwireCompanyInfo: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {capabilities.map((capability, index) => (
             <div key={index} className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg">
-              <capability.icon className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" />
+              <capability.icon className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
               <div>
                 <h4 className="font-medium text-gray-900 mb-1">{capability.title}</h4>
                 <p className="text-sm text-gray-600">{capability.description}</p>
@@ -72,11 +72,11 @@ const SwireCompanyInfo: React.FC = () => {
       </div>
 
       {/* Company Values */}
-      <div className="mt-6 p-4 bg-green-50 rounded-lg">
-        <h3 className="text-lg font-semibold text-green-900 mb-2">Our Mission</h3>
-        <p className="text-green-800">
-          To accelerate the transition to clean energy by developing, building, and operating 
-          world-class renewable energy projects that deliver sustainable value for our stakeholders 
+      <div className="mt-6 p-4 bg-red-50 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-900 mb-2">Our Mission</h3>
+        <p className="text-red-800">
+          To accelerate the transition to clean energy by developing, building, and operating
+          world-class renewable energy projects that deliver sustainable value for our stakeholders
           and communities.
         </p>
       </div>

@@ -22,4 +22,4 @@ RUN mkdir -p data/docs data/hse logs
 EXPOSE 8000
 
 # Run the application
-CMD ["python", "app_simple.py"]
+CMD ["uvicorn", "app_simple:app", "--host", "0.0.0.0", "--port", "8000"]

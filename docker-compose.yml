@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  swire-frontend:
+    build:
+      context: ./swire-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - BACKEND_API_URL=http://swire-backend:8000
+    depends_on:
+      - swire-backend
+
+  swire-backend:
+    build:
+      context: ./swire-agent-core
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_DEPLOYMENT=${AZURE_OPENAI_DEPLOYMENT:-gpt-4o}
+      - AZURE_OPENAI_EMBEDDING_DEPLOYMENT=${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:-text-embedding-3-small}
+      - AZURE_SEARCH_KEY=${AZURE_SEARCH_KEY}
+      - AZURE_SEARCH_ENDPOINT=${AZURE_SEARCH_ENDPOINT}
+      - AZURE_SEARCH_INDEX=${AZURE_SEARCH_INDEX:-swire-operations-index}
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+    volumes:
+      - ./swire-agent-core/data:/app/data
+      - ./swire-agent-core/logs:/app/logs
+      - ./enterprise-data:/app/enterprise-data
+    restart: unless-stopped
+
+  data-ingest:
+    build:
+      context: ./swire-agent-core
+      dockerfile: Dockerfile
+    environment:
+      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_EMBEDDING_DEPLOYMENT=${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:-text-embedding-3-small}
+      - AZURE_SEARCH_KEY=${AZURE_SEARCH_KEY}
+      - AZURE_SEARCH_ENDPOINT=${AZURE_SEARCH_ENDPOINT}
+      - AZURE_SEARCH_INDEX=${AZURE_SEARCH_INDEX:-swire-operations-index}
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+      - AZURE_STORAGE_CONTAINER=${AZURE_STORAGE_CONTAINER:-operations-manuals}
+      - DATA_PATH=/app/enterprise-data
+    volumes:
+      - ./enterprise-data:/app/enterprise-data
+    command: [ "python", "ingest_operations_data.py", "--create-index" ]
+    profiles:
+      - ingest

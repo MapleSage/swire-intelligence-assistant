@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, BarChart3, Users, Shield, TrendingUp, Upload, Settings, Mic, MicOff, Camera, Paperclip, Globe, Monitor, Copy, Volume2, ThumbsUp, ThumbsDown, RotateCcw, Plus } from "lucide-react";
+import { Send, User, Bot, BarChart3, Users, Shield, TrendingUp, Upload, Mic, MicOff, Paperclip, Globe, Copy, Volume2, ThumbsUp, ThumbsDown, Plus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import DocumentUpload from "./DocumentUpload";
 import ModelSelector from "./ModelSelector";
@@ -8,19 +8,12 @@ interface Message {
   id: string;
   content: string;
   sender: "user" | "assistant";
-  timestamp: Date;
+  timestamp: string;
 }
 
 const SwireChatInterface: React.FC = () => {
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content: "Hello! I'm SageGreen AI Assistant. I'm here to help you with ESG compliance, renewable energy, sustainability metrics, and environmental insights. How can I assist you today?",
-      sender: "assistant",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showDocumentUpload, setShowDocumentUpload] = useState(false);
@@ -37,6 +30,26 @@ const SwireChatInterface: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    setMessages([
+      {
+        id: "1",
+        content:
+          "Hello! I'm Swire Intelligence Assistant. I'm here to help you with Operations Manuals, HR policies, ESG compliance, and renewable energy insights. How can I assist you today?",
+        sender: "assistant",
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+  }, []);
+
+  const formatTime = (iso: string) => {
+    try {
+      return new Date(iso).toLocaleTimeString();
+    } catch {
+      return "";
+    }
+  };
+
   const sendMessage = async (messageText?: string) => {
     const textToSend = messageText || inputMessage;
     if (!textToSend.trim() || isLoading) return;
@@ -45,7 +58,7 @@ const SwireChatInterface: React.FC = () => {
       id: Date.now().toString(),
       content: textToSend,
       sender: "user",
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -58,7 +71,8 @@ const SwireChatInterface: React.FC = () => {
 
       // Try Azure OpenAI + Cognitive Search first (PRIMARY)
       try {
-        response = await fetch("/api/azure-kb-chat", {
+        // Use the proxied API endpoint that routes to our swire-backend container
+        response = await fetch("/api/swire/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -72,42 +86,24 @@ const SwireChatInterface: React.FC = () => {
         if (response.ok) {
           data = await response.json();
         } else {
-          throw new Error(`Azure AI failed: ${response.status}`);
+          throw new Error(`Swire Backend failed: ${response.status}`);
         }
-      } catch (azureError) {
-        console.log('Azure AI failed, trying FastAPI fallback:', azureError);
+      } catch (error) {
+        console.log('Swire Backend failed, using fallback:', error);
 
-        // Fallback to FastAPI backend (Azure Container Instance)
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://20.72.179.10';
-        try {
-          response = await fetch(`${backendUrl}/chat`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ query: textToSend }),
-          });
-
-          if (response.ok) {
-            data = await response.json();
-          } else {
-            throw new Error(`FastAPI backend also failed: ${response.status}`);
-          }
-        } catch (fastApiError) {
-          console.log('FastAPI also failed, using fallback response');
-          const q = textToSend.toLowerCase();
-          const fallbackResponse = q.includes('esg') || q.includes('sustainability')
-            ? 'SageGreen helps organizations track ESG compliance, sustainability metrics, and renewable energy performance.'
-            : 'I am SageGreen AI, your ESG and Renewable Energy assistant. How can I help you?';
-          data = { response: fallbackResponse };
-        }
+        // Final fallback for demo purposes
+        const q = textToSend.toLowerCase();
+        const fallbackResponse = q.includes('operations') || q.includes('manual')
+          ? 'Swire Intelligence Assistant helps you navigate operations manuals and maintenance procedures. Please try again later for real-time data.'
+          : 'I am Swire Intelligence Assistant, your expert in renewable energy and operations. The backend is currently unavailable, but I can assist with general queries.';
+        data = { response: fallbackResponse };
       }
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.response || "I'm sorry, I couldn't process that request.",
         sender: "assistant",
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -117,7 +113,7 @@ const SwireChatInterface: React.FC = () => {
         id: (Date.now() + 1).toString(),
         content: "I'm sorry, there was an error connecting to all services. Please try again later.",
         sender: "assistant",
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -141,7 +137,7 @@ const SwireChatInterface: React.FC = () => {
       recorder.ondataavailable = (e) => chunks.push(e.data);
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: "audio/wav" });
-        
+
         try {
           const formData = new FormData();
           formData.append("audio", blob, "recording.wav");
@@ -158,7 +154,7 @@ const SwireChatInterface: React.FC = () => {
         } catch (error) {
           console.error("Speech to text error:", error);
         }
-        
+
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -189,12 +185,12 @@ const SwireChatInterface: React.FC = () => {
       id: Date.now().toString(),
       content: `📄 Document uploaded: **${metadata.filename}**\n\nAnalyzing document content...`,
       sender: "user",
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
-    
+
     setMessages((prev) => [...prev, documentMessage]);
     setShowDocumentUpload(false);
-    
+
     setTimeout(() => {
       sendMessage(`Please analyze this document: ${content.substring(0, 2000)}...`);
     }, 1000);
@@ -227,68 +223,67 @@ const SwireChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-app-bg overflow-hidden">
       {/* Sidebar - Hidden on mobile */}
-      <div className="hidden lg:flex w-72 bg-slate-900 shadow-2xl flex-col">
-        <div className="p-6 border-b border-slate-700 bg-gradient-to-br from-emerald-500 to-teal-600">
+      <div className="hidden lg:flex w-72 bg-[#0f1b2d] shadow-2xl flex-col">
+        <div className="p-6 border-b border-white/10 bg-gradient-to-br from-[#c8102e] to-[#971228]">
           <div className="flex items-center space-x-3">
-            <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg">
-              <img src="/sageigreen_logo_ wht.png" alt="SageGreen" className="w-20 h-20 rounded-xl object-contain" />
+            <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg bg-white p-2">
+              <img src="/swire-sticky-logo.svg" alt="Swire" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="font-bold text-white text-lg">SageGreen</h1>
-              <p className="text-sm text-slate-200">Renewable Energy AI</p>
+              <h1 className="font-bold text-white text-lg">Swire AI</h1>
+              <p className="text-sm text-slate-200">Intelligence Assistant</p>
             </div>
           </div>
         </div>
 
         <div className="p-6 flex-1 overflow-y-auto">
           <div className="mb-6">
-            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">AI Model</h3>
-            <div className="bg-slate-800 rounded-xl p-3 border border-slate-700">
-              <ModelSelector 
-                selectedModel={selectedModel} 
-                onModelChange={setSelectedModel} 
+            <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">AI Model</h3>
+            <div className="bg-[#1a2a42] rounded-xl p-3 border border-white/10">
+              <ModelSelector
+                selectedModel={selectedModel}
+                onModelChange={setSelectedModel}
               />
             </div>
           </div>
-          
+
           <div className="mb-6">
-            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Tools</h3>
+            <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Tools</h3>
             <div className="space-y-2">
               <button
                 onClick={() => setShowDocumentUpload(true)}
-                className="w-full flex items-center space-x-3 p-3 text-left text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition-all duration-200 group">
-                <Upload className="w-4 h-4 text-blue-400 group-hover:text-blue-300" />
+                className="w-full flex items-center space-x-3 p-3 text-left text-sm text-slate-300 hover:bg-[#1a2a42] hover:text-white rounded-xl transition-all duration-200 group">
+                <Upload className="w-4 h-4 text-[#f8c7d2] group-hover:text-white" />
                 <span>Upload Document</span>
               </button>
-              
+
               <button
                 onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-                className={`w-full flex items-center space-x-3 p-3 text-left text-sm rounded-xl transition-all duration-200 group ${
-                  isRecording 
-                    ? "text-red-300 bg-red-900/30 hover:bg-red-900/50" 
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                }`}>
+                className={`w-full flex items-center space-x-3 p-3 text-left text-sm rounded-xl transition-all duration-200 group ${isRecording
+                    ? "text-red-300 bg-red-900/30 hover:bg-red-900/50"
+                    : "text-slate-300 hover:bg-[#1a2a42] hover:text-white"
+                  }`}>
                 {isRecording ? (
                   <MicOff className="w-4 h-4 text-red-400" />
                 ) : (
-                  <Mic className="w-4 h-4 text-purple-400 group-hover:text-purple-300" />
+                  <Mic className="w-4 h-4 text-[#f8c7d2] group-hover:text-white" />
                 )}
                 <span>{isRecording ? "Stop Recording" : "Voice Input"}</span>
               </button>
             </div>
           </div>
-          
+
           <div>
-            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Quick Actions</h3>
+            <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Quick Actions</h3>
             <div className="space-y-2">
               {quickActions.map((action, index) => (
                 <button
                   key={index}
                   onClick={() => handleQuickAction(action.query)}
-                  className="w-full flex items-center space-x-3 p-3 text-left text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition-all duration-200 group">
-                  <action.icon className="w-4 h-4 text-emerald-400 group-hover:text-emerald-300" />
+                  className="w-full flex items-center space-x-3 p-3 text-left text-sm text-slate-300 hover:bg-[#1a2a42] hover:text-white rounded-xl transition-all duration-200 group">
+                  <action.icon className="w-4 h-4 text-[#f8c7d2] group-hover:text-white" />
                   <span>{action.label}</span>
                 </button>
               ))}
@@ -296,17 +291,17 @@ const SwireChatInterface: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-auto p-6 border-t border-slate-700">
+        <div className="mt-auto p-6 border-t border-white/10">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#c8102e] to-[#971228] rounded-lg flex items-center justify-center">
               <User className="w-4 h-4 text-white" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm text-slate-300 font-medium">
-                SageGreen User
+                Swire Professional
               </span>
               <span className="text-xs text-slate-500">
-                ESG & Renewable Energy
+                Operations & Renewables
               </span>
             </div>
           </div>
@@ -316,17 +311,17 @@ const SwireChatInterface: React.FC = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
-        <div className="lg:hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-3 flex items-center justify-center">
+        <div className="lg:hidden bg-gradient-to-br from-[#c8102e] to-[#971228] p-3 flex items-center justify-center">
           <div className="flex items-center space-x-2">
-            <img src="/sageigreen_logo_ wht.png" alt="SageGreen" className="w-6 h-6 rounded" />
-            <h1 className="font-bold text-white text-sm">SageGreen AI</h1>
+            <img src="/swire-sticky-logo.svg" alt="Swire" className="w-6 h-6 rounded bg-white p-0.5" />
+            <h1 className="font-bold text-white text-sm">Swire Intelligence Assistant</h1>
           </div>
         </div>
-        
+
         {/* Desktop Header */}
-        <div className="hidden lg:block bg-white/80 backdrop-blur-sm border-b border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900">Renewable Energy Assistant</h2>
-          <p className="text-sm text-slate-600 mt-1">Financial data, operations metrics, safety protocols, and industry insights</p>
+        <div className="hidden lg:block bg-white/90 backdrop-blur-sm border-b border-app-line p-6">
+          <h2 className="text-xl font-bold text-slate-900">Swire Intelligence Assistant</h2>
+          <p className="text-sm text-slate-600 mt-1">Operations manuals, HR policies, ESG data, and offshore insights</p>
         </div>
 
         {/* Messages */}
@@ -336,15 +331,14 @@ const SwireChatInterface: React.FC = () => {
               key={message.id}
               className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-full lg:max-w-4xl p-3 lg:p-5 rounded-2xl shadow-sm ${
-                  message.sender === "user"
-                    ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
-                    : "bg-white border border-slate-200 text-slate-900"
-                }`}>
+                className={`max-w-full lg:max-w-4xl p-3 lg:p-5 rounded-2xl shadow-sm ${message.sender === "user"
+                    ? "bg-gradient-to-br from-[#c8102e] to-[#971228] text-white"
+                    : "bg-white border border-app-line text-slate-900"
+                  }`}>
                 <div className="flex items-start space-x-3">
                   {message.sender === "assistant" && (
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <img src="/SageGreen-1.png" alt="SageGreen" className="w-8 h-8 rounded-xl" />
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 bg-red-50 p-1">
+                      <img src="/swire-sticky-logo.svg" alt="Swire" className="w-full h-full" />
                     </div>
                   )}
                   <div className="flex-1">
@@ -354,30 +348,30 @@ const SwireChatInterface: React.FC = () => {
                       </ReactMarkdown>
                     </div>
                     <div className="text-xs opacity-70 mt-2 flex items-center justify-between">
-                      <span>{message.timestamp.toLocaleTimeString()}</span>
+                      <span suppressHydrationWarning>{formatTime(message.timestamp)}</span>
                       {message.sender === "assistant" && (
                         <div className="flex items-center space-x-2">
-                          <button 
+                          <button
                             onClick={() => copyToClipboard(message.content)}
-                            className="p-1 hover:bg-slate-100 rounded" 
+                            className="p-1 hover:bg-slate-100 rounded"
                             title="Copy">
                             <Copy className="w-3 h-3" />
                           </button>
-                          <button 
+                          <button
                             onClick={() => readAloud(message.content)}
-                            className="p-1 hover:bg-slate-100 rounded" 
+                            className="p-1 hover:bg-slate-100 rounded"
                             title="Read aloud">
                             <Volume2 className="w-3 h-3" />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleFeedback(message.id, 'up')}
-                            className="p-1 hover:bg-slate-100 rounded" 
+                            className="p-1 hover:bg-slate-100 rounded"
                             title="Good response">
                             <ThumbsUp className="w-3 h-3" />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleFeedback(message.id, 'down')}
-                            className="p-1 hover:bg-slate-100 rounded" 
+                            className="p-1 hover:bg-slate-100 rounded"
                             title="Bad response">
                             <ThumbsDown className="w-3 h-3" />
                           </button>
@@ -391,9 +385,9 @@ const SwireChatInterface: React.FC = () => {
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+              <div className="bg-white border border-app-line p-5 rounded-2xl shadow-sm">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#c8102e] to-[#971228] rounded-xl flex items-center justify-center">
                     <Bot className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex space-x-1">
@@ -409,7 +403,7 @@ const SwireChatInterface: React.FC = () => {
         </div>
 
         {/* Input */}
-        <div className="bg-white/80 backdrop-blur-sm border-t border-slate-200 p-3 lg:p-6">
+        <div className="bg-white/90 backdrop-blur-sm border-t border-app-line p-3 lg:p-6">
           <div className="flex items-end space-x-2 lg:space-x-4">
             <div className="flex-1 relative">
               <textarea
@@ -417,7 +411,7 @@ const SwireChatInterface: React.FC = () => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask about renewable energy..."
-                className="w-full p-3 lg:p-4 border border-slate-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none bg-white shadow-sm text-sm lg:text-base"
+                className="w-full p-3 lg:p-4 border border-slate-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none bg-white shadow-sm text-sm lg:text-base"
                 rows={1}
                 disabled={isLoading}
               />
@@ -444,24 +438,23 @@ const SwireChatInterface: React.FC = () => {
             </div>
             <button
               onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-              className={`p-2 lg:p-3 rounded-xl transition-all duration-200 ${
-                isRecording 
-                  ? "text-red-600 bg-red-50 hover:bg-red-100" 
+              className={`p-2 lg:p-3 rounded-xl transition-all duration-200 ${isRecording
+                  ? "text-red-600 bg-red-50 hover:bg-red-100"
                   : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
-              }`}
+                }`}
               title="Voice input">
               {isRecording ? <MicOff className="w-4 h-4 lg:w-5 lg:h-5" /> : <Mic className="w-4 h-4 lg:w-5 lg:h-5" />}
             </button>
             <button
               onClick={() => sendMessage()}
               disabled={!inputMessage.trim() || isLoading}
-              className="p-3 lg:p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg">
+              className="p-3 lg:p-4 bg-gradient-to-r from-[#c8102e] to-[#971228] text-white rounded-2xl hover:from-[#b10f2a] hover:to-[#831022] focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg">
               <Send className="w-4 h-4 lg:w-5 lg:h-5" />
             </button>
           </div>
         </div>
       </div>
-      
+
       {/* Document Upload Modal */}
       {showDocumentUpload && (
         <DocumentUpload
